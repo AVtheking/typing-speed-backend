@@ -36,7 +36,7 @@ export class LoggingInterceptor implements NestInterceptor {
         this.logger.error(`${method} ${url} ${status} - ${elapsedTime}ms`);
 
         // Propagate the error to the caller
-        return throwError(() => new Error(error));
+        return throwError(error);
       }),
     );
   }

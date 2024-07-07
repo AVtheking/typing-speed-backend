@@ -4,8 +4,29 @@ import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging/logging.interceptor';
 
+import { AuthModule } from './auth/auth.module';
+
+import { OtpModule } from './otp/otp.module';
+import { PrismaService } from './prisma/prisma.service';
+import { UsersModule } from './users/users.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+
 @Module({
-  imports: [],
+  imports: [
+    AuthModule,
+    OtpModule,
+    UsersModule,
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.SMTP_HOST,
+
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      },
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
@@ -13,6 +34,7 @@ import { LoggingInterceptor } from './logging/logging.interceptor';
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    PrismaService,
   ],
 })
 export class AppModule {}
