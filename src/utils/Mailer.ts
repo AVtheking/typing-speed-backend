@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { Env } from 'src/config';
 
 @Injectable()
 export class Mailer {
@@ -13,7 +14,7 @@ export class Mailer {
   ) {
     console.log('\x1b[33mSending mail to: \x1b[1m', email);
     this.mailerService.sendMail({
-      from: process.env.EMAIL,
+      from: Env.EMAIL,
       to: email,
       subject: subject,
       html: html,

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { jwtResetSecret } from '../constants';
+
 import { BaseGuard } from './base.guard';
+import { Env } from 'src/config';
 
 @Injectable()
 export class ResetPasswordGuard extends BaseGuard {
   constructor(jwtService: JwtService) {
-    super(jwtService, jwtResetSecret);
+    super(jwtService, Env.jwtResetSecret);
   }
 }

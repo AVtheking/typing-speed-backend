@@ -11,6 +11,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule } from '@nestjs/config';
+import { Env } from './config';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,11 +22,11 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     MailerModule.forRoot({
       transport: {
-        host: process.env.SMTP_HOST,
+        host: Env.SMTP_HOST,
 
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASSWORD,
+          user: Env.EMAIL,
+          pass: Env.EMAIL_PASSWORD,
         },
       },
     }),

@@ -16,7 +16,6 @@ import { OtpService } from '../otp/otp.service';
 import { UsersService } from '../users/users.service';
 import { Mailer } from '../utils/Mailer';
 import { Utils } from '../utils/utils';
-import { jwtAccessSecret, jwtRefreshSecret, jwtResetSecret } from './constants';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import {
@@ -27,6 +26,7 @@ import {
 } from './dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
+import { Env } from 'src/config';
 
 interface googleUser {
   username: string;
@@ -131,12 +131,12 @@ export class AuthService {
     user = await this.usersService.updateUserVerificationStatus(user.id);
     const accessToken = await this.generateToken(
       user.id,
-      jwtAccessSecret.secret,
+      Env.jwtAccessSecret,
       '1h',
     );
     const refreshToken = await this.generateToken(
       user.id,
-      jwtRefreshSecret.secret,
+      Env.jwtRefreshSecret,
       '10d',
     );
     const userData = this.utlis.userResponse(user);
@@ -167,12 +167,12 @@ export class AuthService {
     }
     const accessToken = await this.generateToken(
       user.id,
-      jwtAccessSecret.secret,
+      Env.jwtAccessSecret,
       '1h',
     );
     const refreshToken = await this.generateToken(
       user.id,
-      jwtRefreshSecret.secret,
+      Env.jwtRefreshSecret,
       '10d',
     );
     const userResponse = this.utlis.userResponse(user);
@@ -250,11 +250,7 @@ export class AuthService {
     const user = await this.usersService.getUserByEmail(email);
 
     //generating the token to reset password
-    const token = await this.generateToken(
-      user.id,
-      jwtResetSecret.secret,
-      '1h',
-    );
+    const token = await this.generateToken(user.id, Env.jwtResetSecret, '1h');
 
     return this.utlis.sendHttpResponse(
       true,
@@ -301,7 +297,7 @@ export class AuthService {
   async refreshToken(res: Response, userId: string): Promise<Response> {
     const accessToken = await this.generateToken(
       userId,
-      jwtAccessSecret.secret,
+      Env.jwtAccessSecret,
       '10d',
     );
 
@@ -373,12 +369,12 @@ export class AuthService {
 
     const accessToken = await this.generateToken(
       userExists.id,
-      jwtAccessSecret.secret,
+      Env.jwtAccessSecret,
       '10d',
     );
     const refreshToken = await this.generateToken(
       userExists.id,
-      jwtRefreshSecret.secret,
+      Env.jwtRefreshSecret,
       '10d',
     );
 
@@ -421,12 +417,12 @@ export class AuthService {
 
     const accessToken = await this.generateToken(
       user.id,
-      jwtAccessSecret.secret,
+      Env.jwtAccessSecret,
       '1h',
     );
     const refreshToken = await this.generateToken(
       user.id,
-      jwtRefreshSecret.secret,
+      Env.jwtRefreshSecret,
       '10d',
     );
     const userResponse = this.utlis.userResponse(user);

@@ -25,7 +25,7 @@ export abstract class BaseGuard implements CanActivate {
     if (token) {
       try {
         const decodedToken = this.jwtService.verify(token, {
-          secret: this.jwtSecret.secret,
+          secret: this.jwtSecret,
         });
 
         request.user = decodedToken.userId;
