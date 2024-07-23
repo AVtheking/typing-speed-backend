@@ -22,6 +22,10 @@ async function bootstrap() {
     .setDescription('Typing Speed Test API')
     .setVersion('1.0')
     .addTag('Speed test')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

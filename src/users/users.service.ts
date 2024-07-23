@@ -49,6 +49,15 @@ export class UsersService {
   async createUser(data: CreateUserDto): Promise<User | Response> {
     const { username, email, password } = data;
 
+    const existingUsername = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (existingUsername && existingUsername.email != email) {
+      throw new ConflictException('Username already taken');
+    }
     //checking if the username already taken
     let user = await this.prisma.user.findUnique({
       where: {
@@ -107,6 +116,7 @@ export class UsersService {
   }
   async updateUserPassword(id: string, password: string): Promise<User> {
     const hashedPassword = await this.hashPassword(password);
+
     return await this.prisma.user.update({
       where: {
         id,
@@ -127,6 +137,11 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    if (!user.verified) {
+      throw new UnauthorizedException('Email not verified');
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');

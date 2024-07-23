@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
@@ -25,6 +26,7 @@ import {
   SignUpResponseDto,
 } from './dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
 
 interface googleUser {
   username: string;
@@ -203,6 +205,9 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    if (!user.verified) {
+      throw new UnauthorizedException('Email not verified');
+    }
     //generating the otp and sending it to mail
     const otp = await this.otpService.generateOtp(email);
     this.mailer.sendForgetPasswordMail(email, otp);
@@ -226,6 +231,9 @@ export class AuthService {
     const { email, otp } = otpData;
     const OTP = await this.otpService.getOtp(email);
 
+    if (!OTP) {
+      throw new BadRequestException('OTP not found');
+    }
     //checking if the token is expired or not
     if (!this.otpService.checkExpiration(OTP)) {
       this.otpService.deleteOtp(email);
@@ -252,7 +260,7 @@ export class AuthService {
       true,
       HttpStatus.OK,
       'OTP verified',
-      { token },
+      { resetPasswordToken: token },
       res,
     );
   }
@@ -273,10 +281,7 @@ export class AuthService {
       throw new BadRequestException('Password is required');
     }
 
-    const hashedPassword = await this.usersService.hashPassword(
-      password.password,
-    );
-    await this.usersService.updateUserPassword(userId, hashedPassword);
+    await this.usersService.updateUserPassword(userId, password.password);
 
     return this.utlis.sendHttpResponse(
       true,
@@ -294,7 +299,6 @@ export class AuthService {
    */
 
   async refreshToken(res: Response, userId: string): Promise<Response> {
-    console.log(userId);
     const accessToken = await this.generateToken(
       userId,
       jwtAccessSecret.secret,
@@ -320,7 +324,11 @@ export class AuthService {
    * @param res
    * @returns user
    */
-  async tokenExchange(access_token: string, res: Response) {
+  async tokenExchange(
+    googleTokenExchangeDto: GoogleTokenExchangeDto,
+    res: Response,
+  ) {
+    const { access_token } = googleTokenExchangeDto;
     const url = `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`;
 
     ///TODO: Add more error handling here
