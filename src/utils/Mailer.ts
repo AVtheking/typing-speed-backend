@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { Env } from 'src/config';
+import { Env } from '../../src/config';
 
 @Injectable()
 export class Mailer {
@@ -20,6 +20,7 @@ export class Mailer {
       html: html,
     });
   }
+
   async sendEmailVerificationMail(email: string, otp: number) {
     const emailSubject = 'Email Verification OTP';
     const html = `
@@ -34,6 +35,7 @@ export class Mailer {
 
     this.sendMail(email, emailSubject, html);
   }
+
   async sendForgetPasswordMail(email: string, otp: number) {
     const emailSubject = 'Reset Password Request';
 

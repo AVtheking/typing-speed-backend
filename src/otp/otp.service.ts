@@ -6,13 +6,16 @@ import { PrismaService } from '../prisma/prisma.service';
 export class OtpService {
   constructor(private prisma: PrismaService) {}
 
-  async getOtp(email: string): Promise<Otp> {
+  async getOtp(email: string): Promise<Otp | null> {
     const otp = await this.prisma.otp.findUnique({
       where: {
         email,
       },
     });
 
+    if (!otp) {
+      return null;
+    }
     return otp;
   }
   async deleteOtp(email: string) {
@@ -32,6 +35,7 @@ export class OtpService {
 
     return diff < 60000;
   }
+
   async generateOtp(email: string): Promise<number> {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const existingOtp = await this.prisma.otp.findFirst({

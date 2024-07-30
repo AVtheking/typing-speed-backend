@@ -3,6 +3,7 @@ import {
   BadRequestException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -26,7 +27,7 @@ import {
 } from './dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
-import { Env } from 'src/config';
+import { Env } from '../../src/config';
 
 interface googleUser {
   username: string;
@@ -54,9 +55,13 @@ export class AuthService {
    */
   async generateToken(
     userId: string,
-    secret: string,
+    secret: string | undefined,
     expiresIn: string,
   ): Promise<string> {
+    if (!secret) {
+      throw new InternalServerErrorException('Secret not found');
+    }
+
     return this.jwtService.sign(
       {
         userId,
@@ -75,26 +80,31 @@ export class AuthService {
    * @returns response
    */
   async signUp(signUp: CreateUserDto, res: Response): Promise<any> {
-    const user = await this.usersService.createUser(signUp);
+    try {
+      console.log('signUp', signUp);
+      const user = await this.usersService.createUser(signUp);
 
-    if (!('email' in user)) {
-      return;
+      if (!('email' in user)) {
+        return;
+      }
+      const otp = await this.otpService.generateOtp(signUp.email);
+      this.mailer.sendEmailVerificationMail(signUp.email, otp);
+
+      const responseData = plainToInstance(SignUpResponseDto, {
+        username: signUp.username,
+        email: signUp.email,
+      });
+
+      return this.utlis.sendHttpResponse(
+        true,
+        HttpStatus.CREATED,
+        'User created successfully',
+        responseData,
+        res,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('Error creating user');
     }
-    const otp = await this.otpService.generateOtp(signUp.email);
-    this.mailer.sendEmailVerificationMail(signUp.email, otp);
-
-    const responseData = plainToInstance(SignUpResponseDto, {
-      username: signUp.username,
-      email: signUp.email,
-    });
-
-    return this.utlis.sendHttpResponse(
-      true,
-      HttpStatus.CREATED,
-      'User created successfully',
-      responseData,
-      res,
-    );
   }
 
   /*
@@ -126,6 +136,10 @@ export class AuthService {
 
     //find user by email from usersService
     let user = await this.usersService.getUserByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     //updates the verified field of the user
     user = await this.usersService.updateUserVerificationStatus(user.id);
@@ -162,9 +176,11 @@ export class AuthService {
    */
   async signIn(userData: LoginUserDto, res: Response): Promise<Response> {
     const user = await this.usersService.loginUser(userData);
+
     if (!('id' in user)) {
-      return;
+      throw new InternalServerErrorException('Error logging in user');
     }
+
     const accessToken = await this.generateToken(
       user.id,
       Env.jwtAccessSecret,
@@ -182,6 +198,7 @@ export class AuthService {
       accessToken,
       refreshToken,
     });
+
     return this.utlis.sendHttpResponse(
       true,
       HttpStatus.OK,
@@ -248,6 +265,10 @@ export class AuthService {
     //deleting the otp after it is verified
     await this.otpService.deleteOtp(email);
     const user = await this.usersService.getUserByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     //generating the token to reset password
     const token = await this.generateToken(user.id, Env.jwtResetSecret, '1h');

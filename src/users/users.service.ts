@@ -46,9 +46,10 @@ export class UsersService {
     const saltOrRounds = 10;
     return await bcrypt.hash(password, saltOrRounds);
   }
+
   async createUser(data: CreateUserDto): Promise<User | Response> {
     const { username, email, password } = data;
-
+    console.log('data', data);
     const existingUsername = await this.prisma.user.findUnique({
       where: {
         username,
@@ -148,7 +149,7 @@ export class UsersService {
     }
     return user;
   }
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User | null> {
     if (!email) throw new BadRequestException('Email is required');
     return await this.prisma.user.findUnique({
       where: {
