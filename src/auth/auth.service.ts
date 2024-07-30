@@ -80,30 +80,26 @@ export class AuthService {
    * @returns response
    */
   async signUp(signUp: CreateUserDto, res: Response): Promise<any> {
-    try {
-      const user = await this.usersService.createUser(signUp);
+    const user = await this.usersService.createUser(signUp);
 
-      if (!('email' in user)) {
-        return;
-      }
-      const otp = await this.otpService.generateOtp(signUp.email);
-      this.mailer.sendEmailVerificationMail(signUp.email, otp);
-
-      const responseData = plainToInstance(SignUpResponseDto, {
-        username: signUp.username,
-        email: signUp.email,
-      });
-
-      return this.utlis.sendHttpResponse(
-        true,
-        HttpStatus.CREATED,
-        'User created successfully',
-        responseData,
-        res,
-      );
-    } catch (error) {
-      throw new InternalServerErrorException('Error creating user');
+    if (!('email' in user)) {
+      return;
     }
+    const otp = await this.otpService.generateOtp(signUp.email);
+    this.mailer.sendEmailVerificationMail(signUp.email, otp);
+
+    const responseData = plainToInstance(SignUpResponseDto, {
+      username: signUp.username,
+      email: signUp.email,
+    });
+
+    return this.utlis.sendHttpResponse(
+      true,
+      HttpStatus.CREATED,
+      'User created successfully',
+      responseData,
+      res,
+    );
   }
 
   /*
