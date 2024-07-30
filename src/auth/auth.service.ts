@@ -81,7 +81,6 @@ export class AuthService {
    */
   async signUp(signUp: CreateUserDto, res: Response): Promise<any> {
     try {
-      console.log('signUp', signUp);
       const user = await this.usersService.createUser(signUp);
 
       if (!('email' in user)) {
