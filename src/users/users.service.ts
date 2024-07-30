@@ -49,7 +49,6 @@ export class UsersService {
 
   async createUser(data: CreateUserDto): Promise<User | Response> {
     const { username, email, password } = data;
-    console.log('data', data);
     const existingUsername = await this.prisma.user.findUnique({
       where: {
         username,
