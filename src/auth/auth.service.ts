@@ -118,7 +118,7 @@ export class AuthService {
 
     const OTP = await this.otpService.getOtp(email);
     if (!OTP) {
-      throw new BadRequestException('OTP not found');
+      throw new NotFoundException('OTP not found');
     }
 
     if (!this.otpService.checkExpiration(OTP)) {
