@@ -265,6 +265,10 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    if (!user.verified) {
+      throw new UnauthorizedException('Email not verified');
+    }
+
     //generating the token to reset password
     const token = await this.generateToken(user.id, Env.jwtResetSecret, '1h');
 
