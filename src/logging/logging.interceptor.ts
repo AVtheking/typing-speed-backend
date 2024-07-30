@@ -32,9 +32,10 @@ export class LoggingInterceptor implements NestInterceptor {
       catchError((error) => {
         const status = error instanceof HttpException ? error.getStatus() : 500;
         const elapsedTime = Date.now() - now;
+
         // Log the exception details
         this.logger.error(`${method} ${url} ${status} - ${elapsedTime}ms`);
-
+        this.logger.error(`Error: ${error.message}`);
         // Propagate the error to the caller
         return throwError(error);
       }),
