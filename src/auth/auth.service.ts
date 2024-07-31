@@ -136,6 +136,10 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    if (user.verified) {
+      throw new BadRequestException('Email already verified');
+    }
+
     //updates the verified field of the user
     user = await this.usersService.updateUserVerificationStatus(user.id);
     const accessToken = await this.generateToken(
