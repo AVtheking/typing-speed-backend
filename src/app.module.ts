@@ -12,6 +12,8 @@ import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule } from '@nestjs/config';
 import { Env } from './config';
+import { AdminModule } from './admin/admin.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +22,7 @@ import { Env } from './config';
     AuthModule,
     OtpModule,
     UsersModule,
+    AdminModule,
     MailerModule.forRoot({
       transport: {
         host: Env.SMTP_HOST,
@@ -30,6 +33,7 @@ import { Env } from './config';
         },
       },
     }),
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

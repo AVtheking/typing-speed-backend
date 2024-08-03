@@ -13,6 +13,23 @@ datasource db {
   url      = env("DB_URL")
 }
 
+enum Language {
+  English
+  Hindi
+  Spanish
+  Frendh
+  // Add more languages here
+}
+
+enum TimeZones {
+  IST
+  EST
+  CST
+  PST
+  UTC
+  // Add more timezones here
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -34,4 +51,35 @@ model Otp {
 
   @@index([id, email])
   @@map("otps")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email, id])
+  @@map("admins")
+}
+
+model AdminSettings {
+  id                     String    @id @default(cuid())
+  siteTitle              String
+  metaDescription        String
+  logoImage              String?
+  defaultLanguage        Language
+  defaultTimeZone        TimeZones
+  useSEOfriendlyurl      Boolean
+  discourageSearchEngine Boolean
+  maintainenceMode       Boolean
+  maintainenceMessage    String?
+  euCookieNotification   Boolean
+  analyticsTrackingCode  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([id])
+  @@map("admin_settings")
 }

@@ -7,7 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+
 import { plainToInstance } from 'class-transformer';
 import { Response } from 'express';
 import { LoginUserDto, CreateUserDto, UserDto } from '../auth/dto';
@@ -41,10 +41,6 @@ export class UsersService {
       { user: userData },
       res,
     );
-  }
-  async hashPassword(password: string): Promise<string> {
-    const saltOrRounds = 10;
-    return await bcrypt.hash(password, saltOrRounds);
   }
 
   async createUser(data: CreateUserDto): Promise<User | Response> {
@@ -81,7 +77,7 @@ export class UsersService {
         throw new ConflictException('Username already taken');
       }
 
-      const hashedPassword = await this.hashPassword(password);
+      const hashedPassword = await this.utils.hashPassword(password);
 
       //creating the user and storing it in db
       return this.prisma.user.create({
@@ -115,7 +111,7 @@ export class UsersService {
     });
   }
   async updateUserPassword(id: string, password: string): Promise<User> {
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await this.utils.hashPassword(password);
 
     return await this.prisma.user.update({
       where: {
@@ -142,7 +138,11 @@ export class UsersService {
       throw new UnauthorizedException('Email not verified');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await this.utils.comparePassword(
+      password,
+      user.password,
+    );
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
     }

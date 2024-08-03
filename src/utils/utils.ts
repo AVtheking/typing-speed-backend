@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Admin, User } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { Response } from 'express';
+import * as bcrypt from 'bcrypt';
 import {
   charsDigits,
   charsLowercase,
@@ -9,6 +10,7 @@ import {
   charsUppercase,
 } from '../auth/constants';
 import { UserDto } from '../auth/dto/response-user.dto';
+import { AdminUserDto } from 'src/auth/dto/admin-login.dto';
 
 @Injectable()
 export class Utils {
@@ -29,6 +31,7 @@ export class Utils {
       },
     });
   }
+
   randomPassword() {
     let password = '';
     for (let i = 0; i < 8; i++) {
@@ -48,6 +51,7 @@ export class Utils {
 
     return password;
   }
+
   randomInteger(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -58,5 +62,28 @@ export class Utils {
       ...user,
     });
     return userResponse;
+  }
+  adminResponse(admin: Admin): AdminUserDto {
+    const adminResponse = plainToInstance(AdminUserDto, {
+      ...admin,
+    });
+    return adminResponse;
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const saltOrRounds = 10;
+    return await bcrypt.hash(password, saltOrRounds);
+  }
+
+  async comparePassword(
+    password: string,
+    hashPassword: string,
+  ): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, hashPassword);
+    } catch (error) {
+      console.error('Error comparing password:', error);
+      return false;
+    }
   }
 }

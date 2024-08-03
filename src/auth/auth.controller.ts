@@ -11,6 +11,7 @@ import { Response } from 'express';
 import { RefreshTokenGuard, ResetPasswordGuard } from './guards';
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
+import { AdminDto } from './dto/createAdmin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -92,5 +93,23 @@ export class AuthController {
     @Res() res: Response,
   ) {
     return await this.authService.tokenExchange(googleTokenExchangeDto, res);
+  }
+
+  @Post('admin/signUp')
+  @ApiBody({
+    type: CreateUserDto,
+    description: 'Admin data to create a new admin',
+  })
+  async signUp(@Body() userData: CreateUserDto, @Res() res: Response) {
+    return await this.authService.signUpAdmin(userData, res);
+  }
+
+  @Post('admin/signIn')
+  @ApiBody({
+    type: AdminDto,
+    description: 'Admin data to login',
+  })
+  async signIn(@Body() userData: AdminDto, @Res() res: Response) {
+    return await this.authService.loginAdmin(userData, res);
   }
 }

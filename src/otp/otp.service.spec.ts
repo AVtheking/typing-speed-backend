@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OtpService } from './otp.service';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { prismaMock } from '../mocks/mocks';
 import { Otp } from '@prisma/client';
 

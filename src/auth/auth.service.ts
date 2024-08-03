@@ -29,6 +29,10 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
 import { Env } from '../../src/config';
 
+import { AdminService } from 'src/admin/admin.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
+import { AdminDto } from './dto/createAdmin.dto';
+
 interface googleUser {
   username: string;
   email: string;
@@ -44,6 +48,7 @@ export class AuthService {
     private httpService: HttpService,
     private utlis: Utils,
     private mailer: Mailer,
+    private adminService: AdminService,
   ) {}
 
   /*
@@ -459,6 +464,80 @@ export class AuthService {
       true,
       HttpStatus.CREATED,
       'User created successfully',
+      responseData,
+      res,
+    );
+  }
+
+  async signUpAdmin(data: AdminDto, res: Response) {
+    const { email, password } = data;
+    const hashPassword = await this.utlis.hashPassword(password);
+    const admin = await this.adminService.createAdmin({
+      email,
+      password: hashPassword,
+    });
+
+    if (!admin) {
+      throw new InternalServerErrorException('Error creating admin');
+    }
+    const response = plainToInstance(SignUpResponseDto, {
+      email: data.email,
+    });
+
+    return this.utlis.sendHttpResponse(
+      true,
+      HttpStatus.CREATED,
+      'Admin created successfully',
+      response,
+      res,
+    );
+  }
+
+  async loginAdmin(data: AdminDto, res: Response) {
+    const { email, password } = data;
+    const admin = await this.adminService.findAdminByEmail(email);
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+    const isPasswordMatch = await this.utlis.comparePassword(
+      password,
+      admin.password,
+    );
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    if (!Env.jwtAccessSecret) {
+      throw new InternalServerErrorException('Access secret is not defined');
+    }
+
+    if (!Env.jwtRefreshSecret) {
+      throw new InternalServerErrorException('Refresh secret is not defined');
+    }
+
+    const accessToken = await this.generateToken(
+      admin.id,
+      Env.jwtAccessSecret,
+      '1h',
+    );
+
+    const refreshToken = await this.generateToken(
+      admin.id,
+      Env.jwtRefreshSecret,
+      '10d',
+    );
+
+    const adminUserResponse = this.utlis.adminResponse(admin);
+    const responseData = plainToInstance(AdminLoginDto, {
+      adminUser: adminUserResponse,
+      accessToken,
+      refreshToken,
+    });
+
+    return this.utlis.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Admin logged in',
       responseData,
       res,
     );
