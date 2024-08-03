@@ -13,7 +13,11 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
   app.setGlobalPrefix('api/v1');
-  app.useGlobalPipes(new ValidationPipe({}));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
     origin: '*',

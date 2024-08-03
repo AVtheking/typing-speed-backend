@@ -13,11 +13,11 @@ datasource db {
   url      = env("DB_URL")
 }
 
-enum Language {
+enum Languages {
   English
   Hindi
   Spanish
-  Frendh
+  French
   // Add more languages here
 }
 
@@ -65,20 +65,20 @@ model Admin {
 }
 
 model AdminSettings {
-  id                     String    @id @default(cuid())
-  siteTitle              String
-  metaDescription        String
-  logoImage              String?
-  defaultLanguage        Language
-  defaultTimeZone        TimeZones
-  useSEOfriendlyurl      Boolean
-  discourageSearchEngine Boolean
-  maintainenceMode       Boolean
-  maintainenceMessage    String?
-  euCookieNotification   Boolean
-  analyticsTrackingCode  String?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id                      String    @id @default(cuid())
+  siteTitle               String
+  metaDescription         String
+  logoImage               String?
+  defaultLanguage         Languages @default(English)
+  defaultTimeZone         TimeZones @default(UTC)
+  useSEOFriendlyUrls      Boolean   @default(true)
+  discourageSearchEngines Boolean   @default(false)
+  maintainenceMode        Boolean   @default(false)
+  maintainenceMessage     String?
+  euCookieNotification    Boolean   @default(false)
+  analyticsTrackingCode   String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@index([id])
   @@map("admin_settings")

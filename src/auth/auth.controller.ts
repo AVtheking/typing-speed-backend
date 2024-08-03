@@ -8,11 +8,12 @@ import {
   ResetPasswordDto,
 } from './dto';
 import { Response } from 'express';
-import { RefreshTokenGuard, ResetPasswordGuard } from './guards';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { RefreshTokenGuard, ResetPasswordGuard } from '../guards';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
 import { AdminDto } from './dto/createAdmin.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

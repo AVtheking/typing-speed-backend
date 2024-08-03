@@ -41,7 +41,7 @@ export abstract class BaseGuard implements CanActivate {
       const elapsed = Date.now() - start; // Elapsed time in milliseconds
       this.logRequest(request, 401, elapsed); // Log the failed request (token not found)
 
-      throw new UnauthorizedException('Token not found');
+      throw new UnauthorizedException('User not authorized');
     }
   }
 

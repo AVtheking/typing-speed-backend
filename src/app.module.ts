@@ -33,7 +33,6 @@ import { AdminModule } from './admin/admin.module';
         },
       },
     }),
-    AdminModule,
   ],
   controllers: [AppController],
   providers: [
