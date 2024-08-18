@@ -21,7 +21,7 @@ import {
 import { Response } from 'express';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { cleanData } from 'src/boolean';
-import { AuthGuard } from 'src/guards';
+import { AdminGuard } from 'src/guards';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -33,7 +33,7 @@ export class AdminController {
     return this.adminService.getAdminSettings(res);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AdminGuard)
   @Put('settings')
   @UseInterceptors(
     FileInterceptor('logoImage', {

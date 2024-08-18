@@ -27,7 +27,7 @@ import {
 } from './dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
-import { Env } from '../../src/config';
+import { Env } from 'src/config';
 
 import { AdminService } from 'src/admin/admin.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -507,31 +507,26 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    if (!Env.jwtAccessSecret) {
+    if (!Env.jwtAdminSecret) {
       throw new InternalServerErrorException('Access secret is not defined');
     }
 
-    if (!Env.jwtRefreshSecret) {
-      throw new InternalServerErrorException('Refresh secret is not defined');
-    }
-
-    const accessToken = await this.generateToken(
+    const adminAccessToken = await this.generateToken(
       admin.id,
-      Env.jwtAccessSecret,
+      Env.jwtAdminSecret,
       '1h',
     );
 
-    const refreshToken = await this.generateToken(
-      admin.id,
-      Env.jwtRefreshSecret,
-      '10d',
-    );
+    // const refreshToken = await this.generateToken(
+    //   admin.id,
+    //   Env.jwtRefreshSecret,
+    //   '10d',
+    // );
 
     const adminUserResponse = this.utlis.adminResponse(admin);
     const responseData = plainToInstance(AdminLoginDto, {
       adminUser: adminUserResponse,
-      accessToken,
-      refreshToken,
+      accessToken: adminAccessToken,
     });
 
     return this.utlis.sendHttpResponse(

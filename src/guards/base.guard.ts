@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-export abstract class BaseGuard implements CanActivate {
+export class BaseGuard implements CanActivate {
   private readonly logger = new Logger();
 
   constructor(

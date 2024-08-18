@@ -30,6 +30,13 @@ enum TimeZones {
   // Add more timezones here
 }
 
+enum Difficulty {
+  Basic
+  Beginner
+  Intermediate
+  Advanced
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -82,4 +89,31 @@ model AdminSettings {
 
   @@index([id])
   @@map("admin_settings")
+}
+
+model PracticeTest {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  difficulty  Difficulty
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Chapter     Chapter[]
+
+  @@index([id])
+  @@map("lessons")
+}
+
+model Chapter {
+  id             String       @id @default(cuid())
+  title          String
+  description    String
+  content        String
+  practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id])
+  practiceTestId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([id])
+  @@map("chapters")
 }

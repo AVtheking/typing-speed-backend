@@ -5,6 +5,8 @@ const getConfig = () => {
 
   const jwtResetSecret = process.env.JWT_RESET_SECRET;
 
+  const jwtAdminSecret = process.env.JWT_ADMIN_SECRET;
+
   const SMTP_HOST = process.env.SMTP_HOST;
 
   const EMAIL = process.env.EMAIL;
@@ -15,6 +17,7 @@ const getConfig = () => {
     jwtAccessSecret,
     jwtRefreshSecret,
     jwtResetSecret,
+    jwtAdminSecret,
     SMTP_HOST,
     EMAIL,
     EMAIL_PASSWORD,

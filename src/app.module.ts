@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule } from '@nestjs/config';
 import { Env } from './config';
 import { AdminModule } from './admin/admin.module';
+import { PracticeTestModule } from './practice_test/practice_test.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AdminModule } from './admin/admin.module';
         },
       },
     }),
+    PracticeTestModule,
   ],
   controllers: [AppController],
   providers: [
