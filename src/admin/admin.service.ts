@@ -75,6 +75,7 @@ export class AdminService implements OnModuleInit {
   async getSettings() {
     return this.prismaService.adminSettings.findFirst();
   }
+
   async ensureDefaultSettings() {
     try {
       const settings = await this.getSettings();
