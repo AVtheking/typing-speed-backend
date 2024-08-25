@@ -1,4 +1,11 @@
-import { IsDefined, IsString } from 'class-validator';
+import { IsDefined, IsEnum, IsString } from 'class-validator';
+
+enum Difficulty {
+  Basic = 'Basic',
+  Beginner = 'Beginner',
+  Intermediate = 'Intermediate',
+  Advanced = 'Advanced',
+}
 
 export class CreatePracticeTestDto {
   @IsString()
@@ -7,4 +14,7 @@ export class CreatePracticeTestDto {
 
   @IsString()
   description: string;
+
+  @IsEnum(Difficulty)
+  difficulty: Difficulty;
 }

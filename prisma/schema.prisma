@@ -37,6 +37,11 @@ enum Difficulty {
   Advanced
 }
 
+enum Layout {
+  BoxLayout
+  LineLayout
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -106,9 +111,8 @@ model PracticeTest {
 
 model Chapter {
   id             String       @id @default(cuid())
-  title          String
-  description    String
   content        String
+  layout         Layout
   practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id])
   practiceTestId String
   createdAt      DateTime     @default(now())

@@ -13,7 +13,7 @@ import {
 import { AdminService } from './admin.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import {
   AdminSettingDto,
   ResponseAdminSettingsDto,
@@ -22,6 +22,7 @@ import { Response } from 'express';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { cleanData } from 'src/boolean';
 import { AdminGuard } from 'src/guards';
+import fs from 'fs';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -33,22 +34,8 @@ export class AdminController {
     return this.adminService.getAdminSettings(res);
   }
 
-  @UseGuards(AdminGuard)
   @Put('settings')
-  @UseInterceptors(
-    FileInterceptor('logoImage', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          const filename = `${file.fieldname}-${uniqueSuffix}${ext}`;
-          cb(null, filename);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('logoImage'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -114,11 +101,9 @@ export class AdminController {
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: new RegExp(/.*\.(jpg|jpeg|png)$/i),
+          fileType: new RegExp('^image/(jpeg|jpg|png)$'),
         })
-        .addMaxSizeValidator({
-          maxSize: 1000,
-        })
+        .addMaxSizeValidator({ maxSize: 1024 * 1024 })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
           fileIsRequired: false,
@@ -128,11 +113,15 @@ export class AdminController {
   ) {
     const cleanedData = cleanData<AdminSettingDto>(data);
     const currentSetting = await this.adminService.getSettings();
+
     if (file) {
-      cleanedData.logoImage = file.filename;
+      const s3Response = await this.adminService.uploadFile(file);
+      console.log('s3Response', s3Response);
+      cleanedData.logoImage = s3Response?.Location ?? undefined;
     } else {
       cleanedData.logoImage = currentSetting?.logoImage ?? undefined;
     }
+
     return this.adminService.updateAdminSettings(cleanedData, res);
   }
 }

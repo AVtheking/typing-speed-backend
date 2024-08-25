@@ -14,9 +14,15 @@ import { ConfigModule } from '@nestjs/config';
 import { Env } from './config';
 import { AdminModule } from './admin/admin.module';
 import { PracticeTestModule } from './practice_test/practice_test.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
+console.log('Path', join(__dirname, '..', '..', 'uploads'));
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'uploads'),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
