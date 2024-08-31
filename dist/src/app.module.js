@@ -23,7 +23,6 @@ const admin_module_1 = require("./admin/admin.module");
 const practice_test_module_1 = require("./practice_test/practice_test.module");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
-console.log('Path', (0, path_1.join)(__dirname, '..', '..', 'uploads'));
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;

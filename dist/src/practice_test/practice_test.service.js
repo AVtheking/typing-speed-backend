@@ -12,24 +12,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PracticeTestService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const utils_1 = require("../utils/utils");
 let PracticeTestService = class PracticeTestService {
-    constructor(prismaService) {
+    constructor(prismaService, util) {
         this.prismaService = prismaService;
+        this.util = util;
     }
-    async create(createPracticeTestDto) {
-        const { title, description, difficulty } = createPracticeTestDto;
-        await this.prismaService.practiceTest.create({
+    async create(createPracticeTestDto, res) {
+        const { chapters, ...practiceTestData } = createPracticeTestDto;
+        const practiceTest = await this.prismaService.practiceTest.create({
             data: {
-                title,
-                description,
-                difficulty,
+                ...practiceTestData,
+                Chapter: {
+                    create: chapters,
+                },
+            },
+            include: {
+                Chapter: true,
             },
         });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Practice Test created', practiceTest, res);
     }
 };
 exports.PracticeTestService = PracticeTestService;
 exports.PracticeTestService = PracticeTestService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        utils_1.Utils])
 ], PracticeTestService);
 //# sourceMappingURL=practice_test.service.js.map

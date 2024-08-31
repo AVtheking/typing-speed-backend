@@ -12,17 +12,21 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+
 import {
   AdminSettingDto,
   ResponseAdminSettingsDto,
 } from './dto/admin_settings.dto';
 import { Response } from 'express';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { cleanData } from 'src/boolean';
-import { AdminGuard } from 'src/guards';
-import fs from 'fs';
+import { AdminGuard } from '../guards';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -34,9 +38,11 @@ export class AdminController {
     return this.adminService.getAdminSettings(res);
   }
 
+  @UseGuards(AdminGuard)
   @Put('settings')
   @UseInterceptors(FileInterceptor('logoImage'))
   @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('JWT')
   @ApiBody({
     schema: {
       type: 'object',

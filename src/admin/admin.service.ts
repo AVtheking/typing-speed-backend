@@ -1,7 +1,6 @@
 import {
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
@@ -65,7 +64,7 @@ export class AdminService implements OnModuleInit {
       },
     };
     try {
-      let s3Response = await this.s3.upload(params).promise();
+      const s3Response = await this.s3.upload(params).promise();
       return s3Response;
     } catch (e) {
       console.log(e);

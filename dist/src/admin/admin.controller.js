@@ -19,6 +19,7 @@ const platform_express_1 = require("@nestjs/platform-express");
 const admin_settings_dto_1 = require("./dto/admin_settings.dto");
 const swagger_1 = require("@nestjs/swagger");
 const boolean_1 = require("../boolean");
+const guards_1 = require("../guards");
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -49,9 +50,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getAdminSettings", null);
 __decorate([
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, common_1.Put)('settings'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('logoImage')),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',

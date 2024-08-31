@@ -97,13 +97,16 @@ model AdminSettings {
 }
 
 model PracticeTest {
-  id          String     @id @default(cuid())
-  title       String
-  description String
-  difficulty  Difficulty
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Chapter     Chapter[]
+  id                  String     @id @default(cuid())
+  title               String
+  description         String
+  titleAndDescription String
+  metaTitle           String
+  metaDescription     String
+  difficulty          Difficulty
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  Chapter             Chapter[]
 
   @@index([id])
   @@map("lessons")
@@ -111,7 +114,8 @@ model PracticeTest {
 
 model Chapter {
   id             String       @id @default(cuid())
-  content        String
+  title          String
+  description    String
   layout         Layout
   practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id])
   practiceTestId String

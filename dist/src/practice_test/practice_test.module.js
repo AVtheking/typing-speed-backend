@@ -11,13 +11,16 @@ const common_1 = require("@nestjs/common");
 const practice_test_service_1 = require("./practice_test.service");
 const practice_test_controller_1 = require("./practice_test.controller");
 const prisma_service_1 = require("../prisma/prisma.service");
+const utils_1 = require("../utils/utils");
+const jwt_1 = require("@nestjs/jwt");
 let PracticeTestModule = class PracticeTestModule {
 };
 exports.PracticeTestModule = PracticeTestModule;
 exports.PracticeTestModule = PracticeTestModule = __decorate([
     (0, common_1.Module)({
+        imports: [jwt_1.JwtModule.register({})],
         controllers: [practice_test_controller_1.PracticeTestController],
-        providers: [practice_test_service_1.PracticeTestService, prisma_service_1.PrismaService],
+        providers: [practice_test_service_1.PracticeTestService, prisma_service_1.PrismaService, utils_1.Utils],
     })
 ], PracticeTestModule);
 //# sourceMappingURL=practice_test.module.js.map

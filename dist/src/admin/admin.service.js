@@ -49,7 +49,7 @@ let AdminService = class AdminService {
             },
         };
         try {
-            let s3Response = await this.s3.upload(params).promise();
+            const s3Response = await this.s3.upload(params).promise();
             return s3Response;
         }
         catch (e) {

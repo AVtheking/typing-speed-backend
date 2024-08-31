@@ -17,7 +17,6 @@ import { PracticeTestModule } from './practice_test/practice_test.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
-console.log('Path', join(__dirname, '..', '..', 'uploads'));
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -26,6 +25,7 @@ console.log('Path', join(__dirname, '..', '..', 'uploads'));
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
     AuthModule,
     OtpModule,
     UsersModule,
