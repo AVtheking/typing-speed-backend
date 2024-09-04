@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { PracticeTestService } from './practice_test.service';
 import { CreatePracticeTestDto } from './dto/create-practice_test.dto';
 
@@ -11,13 +20,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Difficulty } from '@prisma/client';
 
-@ApiTags('Admin')
-@Controller('practice-test')
+@Controller()
 export class PracticeTestController {
   constructor(private practiceTestService: PracticeTestService) {}
-
-  @Post()
+  @ApiTags('Admin')
+  @Post('/admin/createPracticeTest')
   @UseGuards(AdminGuard)
   @ApiConsumes('application/json')
   @ApiBearerAuth('JWT')
@@ -86,6 +95,27 @@ export class PracticeTestController {
     @Body() createPracticeTestDto: CreatePracticeTestDto,
     @Res() res: Response,
   ) {
-    return this.practiceTestService.create(createPracticeTestDto, res);
+    return this.practiceTestService.createTest(createPracticeTestDto, res);
+  }
+
+  @ApiTags('Practice Test')
+  @Get('practiceTest')
+  async getAllTest(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Res() res: Response,
+  ) {
+    page = page > 0 ? page : 1;
+    limit = limit > 0 ? limit : 10;
+    return this.practiceTestService.getAllTest(res, page, limit);
+  }
+
+  @ApiTags('Practice Test')
+  @Get('practiceTest/:level')
+  async getTestByLevel(
+    @Param('level') level: Difficulty,
+    @Res() res: Response,
+  ) {
+    return this.practiceTestService.getTestByDifficulty(level, res);
   }
 }

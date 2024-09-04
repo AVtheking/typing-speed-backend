@@ -56,11 +56,11 @@ let Utils = class Utils {
     }
     async hashPassword(password) {
         const saltOrRounds = 10;
-        return await bcrypt.hash(password, saltOrRounds);
+        return bcrypt.hash(password, saltOrRounds);
     }
     async comparePassword(password, hashPassword) {
         try {
-            return await bcrypt.compare(password, hashPassword);
+            return bcrypt.compare(password, hashPassword);
         }
         catch (error) {
             console.error('Error comparing password:', error);

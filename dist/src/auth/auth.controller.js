@@ -25,35 +25,35 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async SignUp(userData, res) {
-        return await this.authService.signUp(userData, res);
+        return this.authService.signUp(userData, res);
     }
     async verifyEmail(data, res) {
-        return await this.authService.verifyEmail(data, res);
+        return this.authService.verifyEmail(data, res);
     }
     async SignIn(userData, res) {
-        return await this.authService.signIn(userData, res);
+        return this.authService.signIn(userData, res);
     }
     async forgetPassword(data, res) {
-        return await this.authService.forgetPassword(data, res);
+        return this.authService.forgetPassword(data, res);
     }
     async verifyOtp(otpData, res) {
-        return await this.authService.verfiyOtp(otpData, res);
+        return this.authService.verfiyOtp(otpData, res);
     }
     async changePassword(resetData, res, req) {
-        return await this.authService.changePassword(resetData, res, req.user);
+        return this.authService.changePassword(resetData, res, req.user);
     }
     async refreshToken(req, res) {
         const userId = req.user;
-        return await this.authService.refreshToken(res, userId);
+        return this.authService.refreshToken(res, userId);
     }
     async googeleTokenExchange(googleTokenExchangeDto, res) {
-        return await this.authService.tokenExchange(googleTokenExchangeDto, res);
+        return this.authService.tokenExchange(googleTokenExchangeDto, res);
     }
     async signUp(userData, res) {
-        return await this.authService.signUpAdmin(userData, res);
+        return this.authService.signUpAdmin(userData, res);
     }
     async signIn(userData, res) {
-        return await this.authService.loginAdmin(userData, res);
+        return this.authService.loginAdmin(userData, res);
     }
 };
 exports.AuthController = AuthController;
@@ -168,6 +168,7 @@ __decorate([
 ], AuthController.prototype, "signUp", null);
 __decorate([
     (0, common_1.Post)('admin/signIn'),
+    (0, swagger_1.ApiTags)('Admin'),
     (0, swagger_1.ApiBody)({
         type: createAdmin_dto_1.AdminDto,
         description: 'Admin data to login',

@@ -48,7 +48,7 @@ let UsersService = class UsersService {
         });
         if (user) {
             if (!user.verified) {
-                return await this.updateUser(user.id, { username, email });
+                return this.updateUser(user.id, { username, email });
             }
             else {
                 throw new common_1.ConflictException('Email already registered');
@@ -74,7 +74,7 @@ let UsersService = class UsersService {
         }
     }
     async updateUser(id, data) {
-        return await this.prisma.user.update({
+        return this.prisma.user.update({
             where: {
                 id,
             },
@@ -84,7 +84,7 @@ let UsersService = class UsersService {
         });
     }
     async updateUserVerificationStatus(id) {
-        return await this.prisma.user.update({
+        return this.prisma.user.update({
             where: {
                 id,
             },
@@ -95,7 +95,7 @@ let UsersService = class UsersService {
     }
     async updateUserPassword(id, password) {
         const hashedPassword = await this.utils.hashPassword(password);
-        return await this.prisma.user.update({
+        return this.prisma.user.update({
             where: {
                 id,
             },
@@ -126,7 +126,7 @@ let UsersService = class UsersService {
     async getUserByEmail(email) {
         if (!email)
             throw new common_1.BadRequestException('Email is required');
-        return await this.prisma.user.findUnique({
+        return this.prisma.user.findUnique({
             where: {
                 email,
             },

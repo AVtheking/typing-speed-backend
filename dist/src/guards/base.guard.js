@@ -12,11 +12,8 @@ class BaseGuard {
         const start = Date.now();
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
-        console.log(token);
         if (token) {
             try {
-                console.log(this.jwtSecret);
-                console.log(this.jwtService);
                 const decodedToken = this.jwtService.verify(token, {
                     secret: this.jwtSecret,
                 });

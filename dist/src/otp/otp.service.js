@@ -17,18 +17,14 @@ let OtpService = class OtpService {
         this.prisma = prisma;
     }
     async getOtp(email) {
-        const otp = await this.prisma.otp.findUnique({
+        return this.prisma.otp.findUnique({
             where: {
                 email,
             },
         });
-        if (!otp) {
-            return null;
-        }
-        return otp;
     }
     async deleteOtp(email) {
-        await this.prisma.otp.delete({
+        this.prisma.otp.delete({
             where: {
                 email,
             },

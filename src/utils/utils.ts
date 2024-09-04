@@ -72,7 +72,7 @@ export class Utils {
 
   async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;
-    return await bcrypt.hash(password, saltOrRounds);
+    return bcrypt.hash(password, saltOrRounds);
   }
 
   async comparePassword(
@@ -80,7 +80,7 @@ export class Utils {
     hashPassword: string,
   ): Promise<boolean> {
     try {
-      return await bcrypt.compare(password, hashPassword);
+      return bcrypt.compare(password, hashPassword);
     } catch (error) {
       console.error('Error comparing password:', error);
       return false;

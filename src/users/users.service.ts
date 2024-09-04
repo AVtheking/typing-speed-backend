@@ -61,13 +61,19 @@ export class UsersService {
       },
     });
 
+    //if the user is not verified then update the user details that means the user has not registered and updating his details
+    //if the user is verified that means the user is already registered
     if (user) {
       if (!user.verified) {
-        return await this.updateUser(user.id, { username, email });
+        return this.updateUser(user.id, { username, email });
       } else {
         throw new ConflictException('Email already registered');
       }
     } else {
+      //no user exists with that email in db
+
+      //checking if the username is already taken
+      // redundant check
       user = await this.prisma.user.findUnique({
         where: {
           username,
@@ -91,7 +97,7 @@ export class UsersService {
   }
 
   async updateUser(id: string, data: any): Promise<User> {
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id,
       },
@@ -101,7 +107,7 @@ export class UsersService {
     });
   }
   async updateUserVerificationStatus(id: string): Promise<User> {
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id,
       },
@@ -113,7 +119,7 @@ export class UsersService {
   async updateUserPassword(id: string, password: string): Promise<User> {
     const hashedPassword = await this.utils.hashPassword(password);
 
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id,
       },
@@ -150,7 +156,7 @@ export class UsersService {
   }
   async getUserByEmail(email: string): Promise<User | null> {
     if (!email) throw new BadRequestException('Email is required');
-    return await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: {
         email,
       },

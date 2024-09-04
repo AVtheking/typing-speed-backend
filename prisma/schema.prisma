@@ -43,16 +43,31 @@ enum Layout {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  password    String
+  verified    Boolean  @default(false)
+  matchPlayed Int      @default(0)
+  matchWon    Int      @default(0)
+  matchLost   Int      @default(0)
+  rank        Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Test        Test[]
 
   @@index([email, username, id])
   @@map("users")
+}
+
+model Test {
+  id       String @id @default(cuid())
+  userId   String
+  speed    Int
+  accuracy Int
+  time     Int
+  rawSpeed Int
+  User     User   @relation(fields: [userId], references: [id])
 }
 
 model Otp {
@@ -94,6 +109,17 @@ model AdminSettings {
 
   @@index([id])
   @@map("admin_settings")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([id])
+  @@map("categories")
 }
 
 model PracticeTest {

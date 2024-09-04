@@ -24,7 +24,7 @@ export class AuthController {
   })
   @Post('signUp')
   async SignUp(@Body() userData: CreateUserDto, @Res() res: Response) {
-    return await this.authService.signUp(userData, res);
+    return this.authService.signUp(userData, res);
   }
   @Post('verifyEmail')
   @ApiBody({
@@ -32,7 +32,7 @@ export class AuthController {
     description: 'Email and OTP to verify the email',
   })
   async verifyEmail(@Body() data: VerifyOtpDto, @Res() res: Response) {
-    return await this.authService.verifyEmail(data, res);
+    return this.authService.verifyEmail(data, res);
   }
 
   @Post('signIn')
@@ -41,7 +41,7 @@ export class AuthController {
     description: 'User data to login',
   })
   async SignIn(@Body() userData: LoginUserDto, @Res() res: Response) {
-    return await this.authService.signIn(userData, res);
+    return this.authService.signIn(userData, res);
   }
 
   @Post('forgetPassword')
@@ -50,7 +50,7 @@ export class AuthController {
     description: 'Email to send the OTP',
   })
   async forgetPassword(@Body() data: ForgetPasswordDto, @Res() res: Response) {
-    return await this.authService.forgetPassword(data, res);
+    return this.authService.forgetPassword(data, res);
   }
   @Post('verifyOtp')
   @ApiBody({
@@ -58,7 +58,7 @@ export class AuthController {
     description: 'Email and OTP to verify the email',
   })
   async verifyOtp(@Body() otpData: VerifyOtpDto, @Res() res: Response) {
-    return await this.authService.verfiyOtp(otpData, res);
+    return this.authService.verfiyOtp(otpData, res);
   }
 
   @UseGuards(ResetPasswordGuard)
@@ -73,7 +73,7 @@ export class AuthController {
     @Res() res: Response,
     @Req() req: any,
   ) {
-    return await this.authService.changePassword(resetData, res, req.user);
+    return this.authService.changePassword(resetData, res, req.user);
   }
 
   @UseGuards(RefreshTokenGuard)
@@ -81,7 +81,7 @@ export class AuthController {
   @ApiBearerAuth('JWT')
   async refreshToken(@Req() req: any, @Res() res: Response) {
     const userId = req.user;
-    return await this.authService.refreshToken(res, userId);
+    return this.authService.refreshToken(res, userId);
   }
 
   @Post('exchange')
@@ -93,7 +93,7 @@ export class AuthController {
     @Body() googleTokenExchangeDto: GoogleTokenExchangeDto,
     @Res() res: Response,
   ) {
-    return await this.authService.tokenExchange(googleTokenExchangeDto, res);
+    return this.authService.tokenExchange(googleTokenExchangeDto, res);
   }
 
   @Post('admin/signUp')
@@ -102,15 +102,16 @@ export class AuthController {
     description: 'Admin data to create a new admin',
   })
   async signUp(@Body() userData: CreateUserDto, @Res() res: Response) {
-    return await this.authService.signUpAdmin(userData, res);
+    return this.authService.signUpAdmin(userData, res);
   }
 
   @Post('admin/signIn')
+  @ApiTags('Admin')
   @ApiBody({
     type: AdminDto,
     description: 'Admin data to login',
   })
   async signIn(@Body() userData: AdminDto, @Res() res: Response) {
-    return await this.authService.loginAdmin(userData, res);
+    return this.authService.loginAdmin(userData, res);
   }
 }

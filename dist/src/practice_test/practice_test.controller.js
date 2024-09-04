@@ -18,17 +18,27 @@ const practice_test_service_1 = require("./practice_test.service");
 const create_practice_test_dto_1 = require("./dto/create-practice_test.dto");
 const guards_1 = require("../guards");
 const swagger_1 = require("@nestjs/swagger");
+const client_1 = require("@prisma/client");
 let PracticeTestController = class PracticeTestController {
     constructor(practiceTestService) {
         this.practiceTestService = practiceTestService;
     }
     create(createPracticeTestDto, res) {
-        return this.practiceTestService.create(createPracticeTestDto, res);
+        return this.practiceTestService.createTest(createPracticeTestDto, res);
+    }
+    async getAllTest(page = 1, limit = 10, res) {
+        page = page > 0 ? page : 1;
+        limit = limit > 0 ? limit : 10;
+        return this.practiceTestService.getAllTest(res, page, limit);
+    }
+    async getTestByLevel(level, res) {
+        return this.practiceTestService.getTestByDifficulty(level, res);
     }
 };
 exports.PracticeTestController = PracticeTestController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.Post)('/admin/createPracticeTest'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, swagger_1.ApiConsumes)('application/json'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
@@ -98,9 +108,27 @@ __decorate([
     __metadata("design:paramtypes", [create_practice_test_dto_1.CreatePracticeTestDto, Object]),
     __metadata("design:returntype", void 0)
 ], PracticeTestController.prototype, "create", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.Get)('practiceTest'),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getAllTest", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.Get)('practiceTest/:level'),
+    __param(0, (0, common_1.Param)('level')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getTestByLevel", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
-    (0, swagger_1.ApiTags)('Admin'),
-    (0, common_1.Controller)('practice-test'),
+    (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])
 ], PracticeTestController);
 //# sourceMappingURL=practice_test.controller.js.map

@@ -50,6 +50,9 @@ let AuthService = class AuthService {
             return;
         }
         const otp = await this.otpService.generateOtp(signUp.email);
+        if (!otp) {
+            throw new common_1.InternalServerErrorException('Error generating OTP');
+        }
         this.mailer.sendEmailVerificationMail(signUp.email, otp);
         const responseData = (0, class_transformer_1.plainToInstance)(dto_1.SignUpResponseDto, {
             username: signUp.username,
@@ -70,13 +73,13 @@ let AuthService = class AuthService {
         if (OTP.otp != otp) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
-        await this.otpService.deleteOtp(email);
+        this.otpService.deleteOtp(email);
         let user = await this.usersService.getUserByEmail(email);
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
         if (user.verified) {
-            throw new common_1.BadRequestException('Email already verified');
+            throw new common_1.BadRequestException('Email already registered');
         }
         user = await this.usersService.updateUserVerificationStatus(user.id);
         const accessToken = await this.generateToken(user.id, config_1.Env.jwtAccessSecret, '1h');
@@ -130,13 +133,13 @@ let AuthService = class AuthService {
         if (OTP.otp != otp) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
-        await this.otpService.deleteOtp(email);
+        this.otpService.deleteOtp(email);
         const user = await this.usersService.getUserByEmail(email);
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
         if (!user.verified) {
-            throw new common_1.UnauthorizedException('Email not verified');
+            throw new common_1.UnauthorizedException('User with this email does not exist');
         }
         const token = await this.generateToken(user.id, config_1.Env.jwtResetSecret, '1h');
         return this.utlis.sendHttpResponse(true, common_1.HttpStatus.OK, 'OTP verified', { resetPasswordToken: token }, res);
@@ -167,7 +170,7 @@ let AuthService = class AuthService {
                 email: data.email,
                 id: data.sub,
             };
-            return await this.googleSignIn(user, res);
+            return this.googleSignIn(user, res);
         }
     }
     async googleSignIn(user, res) {
@@ -177,7 +180,7 @@ let AuthService = class AuthService {
         const userExists = await this.usersService.getUserByEmail(user.email);
         const password = this.utlis.randomPassword();
         if (!userExists) {
-            return await this.registerOauthUser({
+            return this.registerOauthUser({
                 email: user.email,
                 username: user.username,
                 password: password,

@@ -18,7 +18,7 @@ let PracticeTestService = class PracticeTestService {
         this.prismaService = prismaService;
         this.util = util;
     }
-    async create(createPracticeTestDto, res) {
+    async createTest(createPracticeTestDto, res) {
         const { chapters, ...practiceTestData } = createPracticeTestDto;
         const practiceTest = await this.prismaService.practiceTest.create({
             data: {
@@ -32,6 +32,50 @@ let PracticeTestService = class PracticeTestService {
             },
         });
         return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Practice Test created', practiceTest, res);
+    }
+    async getPracticeTestById(id, res) {
+        const practiceTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                Chapter: true,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
+    }
+    async getAllTest(res, page, limit) {
+        const skip = (page - 1) * limit;
+        const [practiceTests, totalCount] = await Promise.all([
+            this.prismaService.practiceTest.findMany({
+                include: {
+                    Chapter: true,
+                },
+                skip: skip,
+                take: limit,
+            }),
+            this.prismaService.practiceTest.count(),
+        ]);
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Tests found', {
+            practiceTests,
+            pagination: {
+                total: totalCount,
+                page,
+                totalPages: Math.ceil(totalCount / limit),
+                limit,
+            },
+        }, res);
+    }
+    async getTestByDifficulty(difficulty, res) {
+        const practiceTest = await this.prismaService.practiceTest.findMany({
+            where: {
+                difficulty,
+            },
+            include: {
+                Chapter: true,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
     }
 };
 exports.PracticeTestService = PracticeTestService;
