@@ -32,7 +32,6 @@ let AdminService = class AdminService {
         this.ensureDefaultSettings();
     }
     async uploadFile(file) {
-        console.log(file);
         const { originalname } = file;
         return await this.s3_upload(file.buffer, this.AWS_S3_BUCKET_NAME, originalname, file.mimetype);
     }
