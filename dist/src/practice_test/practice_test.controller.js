@@ -260,6 +260,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategory", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])
 ], PracticeTestController);

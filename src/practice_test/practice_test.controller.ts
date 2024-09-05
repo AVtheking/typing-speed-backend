@@ -26,6 +26,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
 
+@ApiTags('Practice Test')
 @Controller()
 export class PracticeTestController {
   constructor(private practiceTestService: PracticeTestService) {}
