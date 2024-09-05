@@ -6,4 +6,5 @@ export declare class AdminController {
     constructor(adminService: AdminService);
     getAdminSettings(res: Response): Promise<Response<any, Record<string, any>>>;
     updateAdminSettings(data: AdminSettingDto, res: Response, file: Express.Multer.File): Promise<Response<any, Record<string, any>>>;
+    getLogoImage(): Promise<string>;
 }

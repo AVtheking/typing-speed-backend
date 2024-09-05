@@ -40,6 +40,9 @@ let AdminController = class AdminController {
         }
         return this.adminService.updateAdminSettings(cleanedData, res);
     }
+    async getLogoImage() {
+        return 'hello';
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -126,6 +129,12 @@ __decorate([
     __metadata("design:paramtypes", [admin_settings_dto_1.AdminSettingDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updateAdminSettings", null);
+__decorate([
+    (0, common_1.Get)('settings/logo'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getLogoImage", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.Controller)('admin'),
