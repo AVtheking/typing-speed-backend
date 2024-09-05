@@ -33,10 +33,10 @@ import { AdminGuard } from '../guards';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // @Get('settings')
-  // async getAdminSettings(@Res() res: Response) {
-  //   return this.adminService.getAdminSettings(res);
-  // }
+  @Get('settings')
+  async getAdminSettings(@Res() res: Response) {
+    return this.adminService.getAdminSettings(res);
+  }
 
   @UseGuards(AdminGuard)
   @Put('settings')

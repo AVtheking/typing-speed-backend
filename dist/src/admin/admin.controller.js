@@ -24,6 +24,9 @@ let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
+    async getAdminSettings(res) {
+        return this.adminService.getAdminSettings(res);
+    }
     async updateAdminSettings(data, res, file) {
         const cleanedData = (0, boolean_1.cleanData)(data);
         const currentSetting = await this.adminService.getSettings();
@@ -39,6 +42,13 @@ let AdminController = class AdminController {
     }
 };
 exports.AdminController = AdminController;
+__decorate([
+    (0, common_1.Get)('settings'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAdminSettings", null);
 __decorate([
     (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, common_1.Put)('settings'),
