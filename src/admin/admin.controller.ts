@@ -130,9 +130,4 @@ export class AdminController {
 
     return this.adminService.updateAdminSettings(cleanedData, res);
   }
-
-  @Get('settings/logo')
-  async getLogoImage() {
-    return 'hello';
-  }
 }
