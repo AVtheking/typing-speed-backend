@@ -1,9 +1,3 @@
-declare enum Difficulty {
-    Basic = "Basic",
-    Beginner = "Beginner",
-    Intermediate = "Intermediate",
-    Advanced = "Advanced"
-}
 declare enum Layout {
     BoxLayout = "BoxLayout",
     LineLayout = "LineLayout"
@@ -19,7 +13,9 @@ export declare class CreatePracticeTestDto {
     titleAndDescription: string;
     metaTitle: string;
     metaDescription: string;
-    difficulty: Difficulty;
+    categoryId: string;
+    categoryName: string;
+    videoTag: string;
     chapters: CreateChapterDto[];
 }
 export {};

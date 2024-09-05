@@ -107,9 +107,29 @@ __decorate([
         enum: Difficulty,
         example: Difficulty.Beginner,
     }),
-    (0, class_validator_1.IsEnum)(Difficulty),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsDefined)(),
     __metadata("design:type", String)
-], CreatePracticeTestDto.prototype, "difficulty", void 0);
+], CreatePracticeTestDto.prototype, "categoryId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Category name of the practice test',
+        example: 'Typing Basics',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsDefined)(),
+    __metadata("design:type", String)
+], CreatePracticeTestDto.prototype, "categoryName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({
+        description: 'Video tag for the practice test',
+        example: 'video-tag',
+        required: false,
+    }),
+    __metadata("design:type", String)
+], CreatePracticeTestDto.prototype, "videoTag", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'List of chapters included in the practice test',

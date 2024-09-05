@@ -20,6 +20,26 @@ let PracticeTestService = class PracticeTestService {
     }
     async createTest(createPracticeTestDto, res) {
         const { chapters, ...practiceTestData } = createPracticeTestDto;
+        const { title, categoryId } = practiceTestData;
+        const existingTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                title,
+            },
+        });
+        if (existingTest) {
+            throw new common_1.ConflictException('Lesson with this title already exists');
+        }
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                id: categoryId,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        if (category.name !== practiceTestData.categoryName) {
+            throw new common_1.ConflictException('Category name does not match');
+        }
         const practiceTest = await this.prismaService.practiceTest.create({
             data: {
                 ...practiceTestData,
@@ -33,6 +53,68 @@ let PracticeTestService = class PracticeTestService {
         });
         return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Practice Test created', practiceTest, res);
     }
+    async updateTest(id, updatePracticeTestDto, res) {
+        const { chapters, ...practiceTestData } = updatePracticeTestDto;
+        let practiceTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        const { categoryId } = practiceTestData;
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                id: categoryId,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        if (category.name !== practiceTestData.categoryName) {
+            throw new common_1.ConflictException('Category does not match');
+        }
+        if (!practiceTest) {
+            throw new common_1.NotFoundException('Practice Test not found');
+        }
+        const existingTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                title: practiceTestData.title,
+            },
+        });
+        if (existingTest && existingTest.id !== id) {
+            throw new common_1.ConflictException('Lesson with this title already exists');
+        }
+        practiceTest = await this.prismaService.practiceTest.update({
+            where: {
+                id,
+            },
+            data: {
+                ...practiceTestData,
+                Chapter: {
+                    create: chapters,
+                },
+            },
+            include: {
+                Chapter: true,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test updated', practiceTest, res);
+    }
+    async deleteTest(id, res) {
+        const practiceTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!practiceTest) {
+            throw new common_1.NotFoundException('Practice Test not found');
+        }
+        await this.prismaService.practiceTest.delete({
+            where: {
+                id,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test deleted', null, res);
+    }
     async getPracticeTestById(id, res) {
         const practiceTest = await this.prismaService.practiceTest.findUnique({
             where: {
@@ -42,6 +124,9 @@ let PracticeTestService = class PracticeTestService {
                 Chapter: true,
             },
         });
+        if (!practiceTest) {
+            throw new common_1.NotFoundException('Practice Test not found');
+        }
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
     }
     async getAllTest(res, page, limit) {
@@ -49,15 +134,23 @@ let PracticeTestService = class PracticeTestService {
         const [practiceTests, totalCount] = await Promise.all([
             this.prismaService.practiceTest.findMany({
                 include: {
-                    Chapter: true,
+                    _count: {
+                        select: {
+                            Chapter: true,
+                        },
+                    },
                 },
                 skip: skip,
                 take: limit,
             }),
             this.prismaService.practiceTest.count(),
         ]);
+        const formattedPracticeTests = practiceTests.map((practiceTest) => ({
+            ...practiceTest,
+            totalChapters: practiceTest._count.Chapter,
+        }));
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Tests found', {
-            practiceTests,
+            practiceTests: formattedPracticeTests,
             pagination: {
                 total: totalCount,
                 page,
@@ -66,16 +159,120 @@ let PracticeTestService = class PracticeTestService {
             },
         }, res);
     }
-    async getTestByDifficulty(difficulty, res) {
-        const practiceTest = await this.prismaService.practiceTest.findMany({
+    async createCategory(createCategoryDto, res) {
+        const { name } = createCategoryDto;
+        const existingCategory = await this.prismaService.category.findUnique({
             where: {
-                difficulty,
-            },
-            include: {
-                Chapter: true,
+                name,
             },
         });
-        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
+        if (existingCategory) {
+            throw new common_1.ConflictException('Category already exists');
+        }
+        const category = await this.prismaService.category.create({
+            data: createCategoryDto,
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Category created', category, res);
+    }
+    async deleteCategory(id, res) {
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        await this.prismaService.category.delete({
+            where: {
+                id,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Category deleted', null, res);
+    }
+    async updateCategory(id, data, res) {
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        const existingCategory = await this.prismaService.category.findUnique({
+            where: {
+                name: data.name,
+            },
+        });
+        if (existingCategory && existingCategory.id !== id) {
+            throw new common_1.ConflictException('Category already exists');
+        }
+        const updatedCategory = await this.prismaService.category.update({
+            where: {
+                id,
+            },
+            data,
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Category updated', updatedCategory, res);
+    }
+    async getCategoryByName(name, res) {
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                name,
+            },
+            include: {
+                PracticeTest: true,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Category found', category, res);
+    }
+    async getCategoryById(id, res) {
+        const category = await this.prismaService.category.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                PracticeTest: true,
+            },
+        });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Category found', category, res);
+    }
+    async getAllCategories(res) {
+        const categories = await this.prismaService.category.findMany({
+            include: {
+                _count: {
+                    select: { PracticeTest: true },
+                },
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Categories found', categories.map((category) => ({
+            ...category,
+            totalPracticeTests: category._count.PracticeTest,
+        })), res);
+    }
+    async getPracticeTestByCategory(categoryId, res) {
+        const practiceTests = await this.prismaService.practiceTest.findMany({
+            where: {
+                categoryId,
+            },
+            include: {
+                _count: {
+                    select: {
+                        Chapter: true,
+                    },
+                },
+            },
+        });
+        if (!practiceTests) {
+            throw new common_1.NotFoundException('Practice Tests not found');
+        }
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Tests found', practiceTests, res);
     }
 };
 exports.PracticeTestService = PracticeTestService;

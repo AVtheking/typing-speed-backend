@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   Query,
   Res,
   UseGuards,
@@ -20,11 +22,71 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Difficulty } from '@prisma/client';
+
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
 
 @Controller()
 export class PracticeTestController {
   constructor(private practiceTestService: PracticeTestService) {}
+
+  @ApiTags('Admin')
+  @UseGuards(AdminGuard)
+  @Post('/admin/createCategory')
+  @ApiBearerAuth('JWT')
+  @ApiBody({
+    type: CreateCategoryDto,
+    description: 'Practice test data to create a new category ',
+  })
+  createCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @Res() res: Response,
+  ) {
+    return this.practiceTestService.createCategory(createCategoryDto, res);
+  }
+
+  @ApiTags('Category')
+  @Get('/allCategories')
+  async getAllCategory(@Res() res: Response) {
+    return this.practiceTestService.getAllCategories(res);
+  }
+
+  @ApiTags('Category')
+  @Get('category/:id')
+  async getCategoryById(@Param('id') id: string, @Res() res: Response) {
+    return this.practiceTestService.getCategoryById(id, res);
+  }
+
+  @ApiTags('Category')
+  @Get('category')
+  async getCategoryByName(@Query('name') name: string, @Res() res: Response) {
+    return this.practiceTestService.getCategoryByName(name, res);
+  }
+
+  @ApiTags('Admin')
+  @UseGuards(AdminGuard)
+  @Put('/admin/updateCategory/:id')
+  @ApiBearerAuth('JWT')
+  @ApiBody({
+    type: CreateCategoryDto,
+    description: 'Practice test data to update a category',
+  })
+  updateCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.practiceTestService.updateCategory(id, createCategoryDto, res);
+  }
+
+  @ApiTags('Admin')
+  @Delete('/admin/deleteCategory/:id')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth('JWT')
+  async deleteCategory(@Param('id') id: string, @Res() res: Response) {
+    return this.practiceTestService.deleteCategory(id, res);
+  }
+
   @ApiTags('Admin')
   @Post('/admin/createPracticeTest')
   @UseGuards(AdminGuard)
@@ -91,11 +153,35 @@ export class PracticeTestController {
     status: 401,
     description: 'User not authorized.',
   })
-  create(
+  createTest(
     @Body() createPracticeTestDto: CreatePracticeTestDto,
     @Res() res: Response,
   ) {
     return this.practiceTestService.createTest(createPracticeTestDto, res);
+  }
+
+  @ApiTags('Admin')
+  @UseGuards(AdminGuard)
+  @Put('/admin/updatePracticeTest/:id')
+  @ApiBearerAuth('JWT')
+  @ApiBody({
+    type: UpdatePracticeTestDto,
+    description: 'Practice test data to update a  practice test',
+  })
+  updatePracticeTest(
+    @Body() updatePracticeTestDto: UpdatePracticeTestDto,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.practiceTestService.updateTest(id, updatePracticeTestDto, res);
+  }
+
+  @Delete('/admin/deletePracticeTest/:id')
+  @ApiTags('Admin')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth('JWT')
+  async deletePracticeTest(@Param('id') id: string, @Res() res: Response) {
+    return this.practiceTestService.deleteTest(id, res);
   }
 
   @ApiTags('Practice Test')
@@ -110,12 +196,26 @@ export class PracticeTestController {
     return this.practiceTestService.getAllTest(res, page, limit);
   }
 
+  @Get('practiceTest/:id')
   @ApiTags('Practice Test')
-  @Get('practiceTest/:level')
-  async getTestByLevel(
-    @Param('level') level: Difficulty,
+  async getTestById(@Param('id') id: string, @Res() res: Response) {
+    return this.practiceTestService.getPracticeTestById(id, res);
+  }
+
+  @ApiTags('Practice Test')
+  @Get('practiceTest/:categoryId')
+  async getTestByCategory(
+    @Param('categoryId') categoryId: string,
     @Res() res: Response,
   ) {
-    return this.practiceTestService.getTestByDifficulty(level, res);
+    return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
   }
+  // @ApiTags('Practice Test')
+  // @Get('practiceTest/:level')
+  // async getTestByLevel(
+  //   @Param('level') level: Difficulty,
+  //   @Res() res: Response,
+  // ) {
+  //   return this.practiceTestService.getTestByDifficulty(level, res);
+  // }
 }

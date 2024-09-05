@@ -51,7 +51,7 @@ model User {
   matchPlayed Int      @default(0)
   matchWon    Int      @default(0)
   matchLost   Int      @default(0)
-  rank        Int
+  rank        Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Test        Test[]
@@ -112,26 +112,33 @@ model AdminSettings {
 }
 
 model Category {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String         @id @default(cuid())
+  name            String         @unique
+  description     String
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  PracticeTest    PracticeTest[]
 
   @@index([id])
   @@map("categories")
 }
 
 model PracticeTest {
-  id                  String     @id @default(cuid())
-  title               String
+  id                  String    @id @default(cuid())
+  title               String    @unique
   description         String
   titleAndDescription String
   metaTitle           String
   metaDescription     String
-  difficulty          Difficulty
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  videoTag            String?
+  categoryId          String
+  categoryName        String
+  category            Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
   Chapter             Chapter[]
 
   @@index([id])
@@ -143,7 +150,7 @@ model Chapter {
   title          String
   description    String
   layout         Layout
-  practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id])
+  practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   practiceTestId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt

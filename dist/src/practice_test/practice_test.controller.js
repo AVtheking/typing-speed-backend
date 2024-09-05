@@ -18,24 +18,120 @@ const practice_test_service_1 = require("./practice_test.service");
 const create_practice_test_dto_1 = require("./dto/create-practice_test.dto");
 const guards_1 = require("../guards");
 const swagger_1 = require("@nestjs/swagger");
-const client_1 = require("@prisma/client");
+const create_category_dto_1 = require("./dto/create-category.dto");
+const update_practice_test_dto_1 = require("./dto/update-practice_test.dto");
 let PracticeTestController = class PracticeTestController {
     constructor(practiceTestService) {
         this.practiceTestService = practiceTestService;
     }
-    create(createPracticeTestDto, res) {
+    createCategory(createCategoryDto, res) {
+        return this.practiceTestService.createCategory(createCategoryDto, res);
+    }
+    async getAllCategory(res) {
+        return this.practiceTestService.getAllCategories(res);
+    }
+    async getCategoryById(id, res) {
+        return this.practiceTestService.getCategoryById(id, res);
+    }
+    async getCategoryByName(name, res) {
+        return this.practiceTestService.getCategoryByName(name, res);
+    }
+    updateCategory(createCategoryDto, id, res) {
+        return this.practiceTestService.updateCategory(id, createCategoryDto, res);
+    }
+    async deleteCategory(id, res) {
+        return this.practiceTestService.deleteCategory(id, res);
+    }
+    createTest(createPracticeTestDto, res) {
         return this.practiceTestService.createTest(createPracticeTestDto, res);
+    }
+    updatePracticeTest(updatePracticeTestDto, id, res) {
+        return this.practiceTestService.updateTest(id, updatePracticeTestDto, res);
+    }
+    async deletePracticeTest(id, res) {
+        return this.practiceTestService.deleteTest(id, res);
     }
     async getAllTest(page = 1, limit = 10, res) {
         page = page > 0 ? page : 1;
         limit = limit > 0 ? limit : 10;
         return this.practiceTestService.getAllTest(res, page, limit);
     }
-    async getTestByLevel(level, res) {
-        return this.practiceTestService.getTestByDifficulty(level, res);
+    async getTestById(id, res) {
+        return this.practiceTestService.getPracticeTestById(id, res);
+    }
+    async getTestByCategory(categoryId, res) {
+        return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
     }
 };
 exports.PracticeTestController = PracticeTestController;
+__decorate([
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
+    (0, common_1.Post)('/admin/createCategory'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiBody)({
+        type: create_category_dto_1.CreateCategoryDto,
+        description: 'Practice test data to create a new category ',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, Object]),
+    __metadata("design:returntype", void 0)
+], PracticeTestController.prototype, "createCategory", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, common_1.Get)('/allCategories'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getAllCategory", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, common_1.Get)('category/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getCategoryById", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, common_1.Get)('category'),
+    __param(0, (0, common_1.Query)('name')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getCategoryByName", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
+    (0, common_1.Put)('/admin/updateCategory/:id'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiBody)({
+        type: create_category_dto_1.CreateCategoryDto,
+        description: 'Practice test data to update a category',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, String, Object]),
+    __metadata("design:returntype", void 0)
+], PracticeTestController.prototype, "updateCategory", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.Delete)('/admin/deleteCategory/:id'),
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "deleteCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.Post)('/admin/createPracticeTest'),
@@ -107,7 +203,34 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_practice_test_dto_1.CreatePracticeTestDto, Object]),
     __metadata("design:returntype", void 0)
-], PracticeTestController.prototype, "create", null);
+], PracticeTestController.prototype, "createTest", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
+    (0, common_1.Put)('/admin/updatePracticeTest/:id'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiBody)({
+        type: update_practice_test_dto_1.UpdatePracticeTestDto,
+        description: 'Practice test data to update a  practice test',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [update_practice_test_dto_1.UpdatePracticeTestDto, String, Object]),
+    __metadata("design:returntype", void 0)
+], PracticeTestController.prototype, "updatePracticeTest", null);
+__decorate([
+    (0, common_1.Delete)('/admin/deletePracticeTest/:id'),
+    (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.UseGuards)(guards_1.AdminGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "deletePracticeTest", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.Get)('practiceTest'),
@@ -119,14 +242,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getAllTest", null);
 __decorate([
+    (0, common_1.Get)('practiceTest/:id'),
     (0, swagger_1.ApiTags)('Practice Test'),
-    (0, common_1.Get)('practiceTest/:level'),
-    __param(0, (0, common_1.Param)('level')),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], PracticeTestController.prototype, "getTestByLevel", null);
+], PracticeTestController.prototype, "getTestById", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.Get)('practiceTest/:categoryId'),
+    __param(0, (0, common_1.Param)('categoryId')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getTestByCategory", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])
