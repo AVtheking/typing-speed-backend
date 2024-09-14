@@ -267,7 +267,9 @@ __decorate([
 ], PracticeTestController.prototype, "getTestByCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
     (0, common_1.Get)('practiceTest/category'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
     __param(0, (0, common_1.Query)('category')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),

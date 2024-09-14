@@ -232,7 +232,9 @@ export class PracticeTestController {
   // }
 
   @ApiTags('Practice Test')
+  @UseGuards(AuthGuard)
   @Get('practiceTest/category')
+  @ApiBearerAuth('JWT')
   async getTestByCategoryName(
     @Query('category') category: string,
     @Res() res: Response,
