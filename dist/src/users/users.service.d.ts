@@ -12,6 +12,8 @@ export declare class UsersService {
     updateUser(id: string, data: any): Promise<User>;
     updateUserVerificationStatus(id: string): Promise<User>;
     updateUserPassword(id: string, password: string): Promise<User>;
+    updateUserEmail(id: string, email: string): Promise<User>;
     loginUser(userData: LoginUserDto): Promise<User | Response>;
     getUserByEmail(email: string): Promise<User | null>;
+    changeEmail(id: string, email: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }

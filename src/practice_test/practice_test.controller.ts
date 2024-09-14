@@ -185,7 +185,7 @@ export class PracticeTestController {
   }
 
   @ApiTags('Practice Test')
-  @Get('practiceTest')
+  @Get('practiceTest/all')
   async getAllTest(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -210,6 +210,16 @@ export class PracticeTestController {
   ) {
     return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
   }
+
+  @ApiTags('Practice Test')
+  @Get('practiceTest')
+  async getTestByCategoryName(
+    @Query('category') category: string,
+    @Res() res: Response,
+  ) {
+    return this.practiceTestService.getTestByCategoryName(category, res);
+  }
+
   // @ApiTags('Practice Test')
   // @Get('practiceTest/:level')
   // async getTestByLevel(

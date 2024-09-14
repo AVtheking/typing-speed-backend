@@ -55,7 +55,7 @@ export class UsersService {
       throw new ConflictException('Username already taken');
     }
     //checking if the username already taken
-    let user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
@@ -74,14 +74,14 @@ export class UsersService {
 
       //checking if the username is already taken
       // redundant check
-      user = await this.prisma.user.findUnique({
-        where: {
-          username,
-        },
-      });
-      if (user) {
-        throw new ConflictException('Username already taken');
-      }
+      // user = await this.prisma.user.findUnique({
+      //   where: {
+      //     username,
+      //   },
+      // });
+      // if (user) {
+      //   throw new ConflictException('Username already taken');
+      // }
 
       const hashedPassword = await this.utils.hashPassword(password);
 
@@ -106,6 +106,7 @@ export class UsersService {
       },
     });
   }
+
   async updateUserVerificationStatus(id: string): Promise<User> {
     return this.prisma.user.update({
       where: {
@@ -116,6 +117,7 @@ export class UsersService {
       },
     });
   }
+
   async updateUserPassword(id: string, password: string): Promise<User> {
     const hashedPassword = await this.utils.hashPassword(password);
 
@@ -125,6 +127,17 @@ export class UsersService {
       },
       data: {
         password: hashedPassword,
+      },
+    });
+  }
+
+  async updateUserEmail(id: string, email: string): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        email,
       },
     });
   }
@@ -161,5 +174,38 @@ export class UsersService {
         email,
       },
     });
+  }
+
+  async changeEmail(id: string, email: string, res: Response) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.verified) {
+      throw new UnauthorizedException('Email not verified');
+    }
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (existingUser) {
+      throw new ConflictException('User with this email already registered');
+    }
+    const updatedUser = await this.updateUserEmail(id, email);
+    return this.utils.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Email updated successfully',
+      {
+        email: updatedUser.email,
+      },
+      res,
+    );
   }
 }

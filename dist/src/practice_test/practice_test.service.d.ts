@@ -20,4 +20,5 @@ export declare class PracticeTestService {
     getCategoryById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllCategories(res: Response): Promise<Response<any, Record<string, any>>>;
     getPracticeTestByCategory(categoryId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestByCategoryName(category: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }

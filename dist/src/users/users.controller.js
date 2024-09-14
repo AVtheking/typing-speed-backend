@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const users_service_1 = require("./users.service");
 const guards_1 = require("../guards");
+const change_email_dto_1 = require("./dto/change-email.dto");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -25,20 +26,36 @@ let UserController = class UserController {
         const userId = req.user;
         return this.userService.getUserById(userId, res);
     }
+    async changeEmail(req, res, body) {
+        const userId = req.user;
+        const { email } = body;
+        return this.userService.changeEmail(userId, email, res);
+    }
 };
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(),
-    (0, common_1.UseGuards)(guards_1.AuthGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUser", null);
+__decorate([
+    (0, common_1.Put)('/change-email'),
+    (0, swagger_1.ApiBody)({ type: change_email_dto_1.ChangeEmailDto }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, change_email_dto_1.ChangeEmailDto]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "changeEmail", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     (0, swagger_1.ApiTags)('User'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UserController);
 //# sourceMappingURL=users.controller.js.map

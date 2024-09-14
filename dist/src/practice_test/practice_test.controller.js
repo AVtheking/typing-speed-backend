@@ -62,6 +62,9 @@ let PracticeTestController = class PracticeTestController {
     async getTestByCategory(categoryId, res) {
         return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
     }
+    async getTestByCategoryName(category, res) {
+        return this.practiceTestService.getTestByCategoryName(category, res);
+    }
 };
 exports.PracticeTestController = PracticeTestController;
 __decorate([
@@ -233,7 +236,7 @@ __decorate([
 ], PracticeTestController.prototype, "deletePracticeTest", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
-    (0, common_1.Get)('practiceTest'),
+    (0, common_1.Get)('practiceTest/all'),
     __param(0, (0, common_1.Query)('page')),
     __param(1, (0, common_1.Query)('limit')),
     __param(2, (0, common_1.Res)()),
@@ -259,6 +262,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategory", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.Get)('practiceTest'),
+    __param(0, (0, common_1.Query)('category')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getTestByCategoryName", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])

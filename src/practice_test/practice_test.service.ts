@@ -397,4 +397,38 @@ export class PracticeTestService {
       res,
     );
   }
+
+  async getTestByCategoryName(category: string, res: Response) {
+    console.log(category);
+    const categoryData = await this.prismaService.category.findUnique({
+      where: {
+        name: category,
+      },
+    });
+
+    if (!categoryData) {
+      throw new NotFoundException('Category not found');
+    }
+
+    const practiceTests = await this.prismaService.practiceTest.findMany({
+      where: {
+        categoryId: categoryData.id,
+      },
+      include: {
+        _count: {
+          select: {
+            Chapter: true,
+          },
+        },
+      },
+    });
+
+    return this.util.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Practice Tests found',
+      practiceTests,
+      res,
+    );
+  }
 }

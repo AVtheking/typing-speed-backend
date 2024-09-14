@@ -148,7 +148,7 @@ model PracticeTest {
 model Chapter {
   id             String       @id @default(cuid())
   title          String
-  description    String
+  embedCode      String
   layout         Layout
   practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   practiceTestId String
@@ -157,4 +157,9 @@ model Chapter {
 
   @@index([id])
   @@map("chapters")
+}
+
+model UserProgress {
+  id     String @id @default(cuid())
+  userId String
 }

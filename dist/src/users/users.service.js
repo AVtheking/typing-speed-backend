@@ -41,7 +41,7 @@ let UsersService = class UsersService {
         if (existingUsername && existingUsername.email != email) {
             throw new common_1.ConflictException('Username already taken');
         }
-        let user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: {
                 email,
             },
@@ -55,14 +55,6 @@ let UsersService = class UsersService {
             }
         }
         else {
-            user = await this.prisma.user.findUnique({
-                where: {
-                    username,
-                },
-            });
-            if (user) {
-                throw new common_1.ConflictException('Username already taken');
-            }
             const hashedPassword = await this.utils.hashPassword(password);
             return this.prisma.user.create({
                 data: {
@@ -104,6 +96,16 @@ let UsersService = class UsersService {
             },
         });
     }
+    async updateUserEmail(id, email) {
+        return this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                email,
+            },
+        });
+    }
     async loginUser(userData) {
         const { email, password } = userData;
         const user = await this.prisma.user.findUnique({
@@ -131,6 +133,31 @@ let UsersService = class UsersService {
                 email,
             },
         });
+    }
+    async changeEmail(id, email, res) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        if (!user.verified) {
+            throw new common_1.UnauthorizedException('Email not verified');
+        }
+        const existingUser = await this.prisma.user.findUnique({
+            where: {
+                email,
+            },
+        });
+        if (existingUser) {
+            throw new common_1.ConflictException('User with this email already registered');
+        }
+        const updatedUser = await this.updateUserEmail(id, email);
+        return this.utils.sendHttpResponse(true, common_1.HttpStatus.OK, 'Email updated successfully', {
+            email: updatedUser.email,
+        }, res);
     }
 };
 exports.UsersService = UsersService;

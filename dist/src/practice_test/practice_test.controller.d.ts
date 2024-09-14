@@ -18,4 +18,5 @@ export declare class PracticeTestController {
     getAllTest(page: number | undefined, limit: number | undefined, res: Response): Promise<Response<any, Record<string, any>>>;
     getTestById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getTestByCategory(categoryId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestByCategoryName(category: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }
