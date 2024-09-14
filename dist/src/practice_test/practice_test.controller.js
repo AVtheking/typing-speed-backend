@@ -166,7 +166,7 @@ __decorate([
                         {
                             id: 'cuid_generated_id_1',
                             title: 'Introduction to typing',
-                            description: 'This chapter covers the basics of typing.',
+                            embedCode: 'j j j j a a a',
                             layout: 'BoxLayout',
                             practiceTestId: 'cuid_generated_id',
                             createdAt: '2024-08-31T12:34:56.789Z',
@@ -175,7 +175,7 @@ __decorate([
                         {
                             id: 'cuid_generated_id_2',
                             title: 'Typing techniques',
-                            description: 'This chapter covers various typing techniques.',
+                            embedCode: 'k k s s ',
                             layout: 'LineLayout',
                             practiceTestId: 'cuid_generated_id',
                             createdAt: '2024-08-31T12:34:56.789Z',

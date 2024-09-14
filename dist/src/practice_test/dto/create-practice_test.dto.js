@@ -39,13 +39,13 @@ __decorate([
 ], CreateChapterDto.prototype, "title", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Description of the chapter',
-        example: 'This chapter covers the basics of typing.',
+        description: 'Embedded code of the chapter',
+        example: 'jjjj aaa as pp',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsDefined)(),
     __metadata("design:type", String)
-], CreateChapterDto.prototype, "description", void 0);
+], CreateChapterDto.prototype, "embedCode", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Layout type for the chapter',

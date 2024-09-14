@@ -31,12 +31,12 @@ export class CreateChapterDto {
   title: string;
 
   @ApiProperty({
-    description: 'Description of the chapter',
-    example: 'This chapter covers the basics of typing.',
+    description: 'Embedded code of the chapter',
+    example: 'jjjj aaa as pp',
   })
   @IsString()
   @IsDefined()
-  description: string;
+  embedCode: string;
 
   @ApiProperty({
     description: 'Layout type for the chapter',

@@ -4,7 +4,7 @@ declare enum Layout {
 }
 export declare class CreateChapterDto {
     title: string;
-    description: string;
+    embedCode: string;
     layout: Layout;
 }
 export declare class CreatePracticeTestDto {
