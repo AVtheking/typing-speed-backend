@@ -16,7 +16,8 @@ export declare class PracticeTestController {
     updatePracticeTest(updatePracticeTestDto: UpdatePracticeTestDto, id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     deletePracticeTest(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllTest(page: number | undefined, limit: number | undefined, res: Response): Promise<Response<any, Record<string, any>>>;
-    getTestById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
-    getTestByCategory(categoryId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestById(id: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
+    getTestByCategory(categoryId: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategoryName(category: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    updateChapterCompleted(practiceTestId: string, chapterId: string, completed: boolean, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
 }

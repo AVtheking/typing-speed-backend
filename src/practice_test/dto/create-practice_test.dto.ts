@@ -32,7 +32,7 @@ export class CreateChapterDto {
 
   @ApiProperty({
     description: 'Embedded code of the chapter',
-    example: 'jjjj aaa as pp',
+    example: 'j j j j a a a',
   })
   @IsString()
   @IsDefined()

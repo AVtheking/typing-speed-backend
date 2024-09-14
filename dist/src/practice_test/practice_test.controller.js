@@ -56,14 +56,20 @@ let PracticeTestController = class PracticeTestController {
         limit = limit > 0 ? limit : 10;
         return this.practiceTestService.getAllTest(res, page, limit);
     }
-    async getTestById(id, res) {
-        return this.practiceTestService.getPracticeTestById(id, res);
+    async getTestById(id, res, req) {
+        const userId = req.user;
+        return this.practiceTestService.getPracticeTestById(id, userId, res);
     }
-    async getTestByCategory(categoryId, res) {
-        return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
+    async getTestByCategory(categoryId, res, req) {
+        const userId = req.user;
+        return this.practiceTestService.getPracticeTestByCategory(categoryId, userId, res);
     }
     async getTestByCategoryName(category, res) {
         return this.practiceTestService.getTestByCategoryName(category, res);
+    }
+    async updateChapterCompleted(practiceTestId, chapterId, completed, req, res) {
+        const userId = req.user;
+        return this.practiceTestService.trackPracticeTestProgress(practiceTestId, chapterId, completed, userId, res);
     }
 };
 exports.PracticeTestController = PracticeTestController;
@@ -172,15 +178,6 @@ __decorate([
                             createdAt: '2024-08-31T12:34:56.789Z',
                             updatedAt: '2024-08-31T12:34:56.789Z',
                         },
-                        {
-                            id: 'cuid_generated_id_2',
-                            title: 'Typing techniques',
-                            embedCode: 'k k s s ',
-                            layout: 'LineLayout',
-                            practiceTestId: 'cuid_generated_id',
-                            createdAt: '2024-08-31T12:34:56.789Z',
-                            updatedAt: '2024-08-31T12:34:56.789Z',
-                        },
                     ],
                 },
             },
@@ -245,32 +242,52 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getAllTest", null);
 __decorate([
-    (0, common_1.Get)('practiceTest/:id'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, common_1.Get)('practiceTest/'),
     (0, swagger_1.ApiTags)('Practice Test'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    __param(0, (0, common_1.Query)('id')),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestById", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
     (0, common_1.Get)('practiceTest/:categoryId'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
     __param(0, (0, common_1.Param)('categoryId')),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
-    (0, common_1.Get)('practiceTest'),
+    (0, common_1.Get)('practiceTest/category'),
     __param(0, (0, common_1.Query)('category')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategoryName", null);
+__decorate([
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.Put)('practiceTest/trackProgress/'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    __param(0, (0, common_1.Query)('practiceTestId')),
+    __param(1, (0, common_1.Query)('chapterId')),
+    __param(2, (0, common_1.Query)('completed')),
+    __param(3, (0, common_1.Req)()),
+    __param(4, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Boolean, Object, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "updateChapterCompleted", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])

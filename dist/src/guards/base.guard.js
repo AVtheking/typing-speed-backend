@@ -17,7 +17,6 @@ class BaseGuard {
                 const decodedToken = this.jwtService.verify(token, {
                     secret: this.jwtSecret,
                 });
-                console.log(decodedToken);
                 request.user = decodedToken.userId;
                 return true;
             }

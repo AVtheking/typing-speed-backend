@@ -115,7 +115,7 @@ let PracticeTestService = class PracticeTestService {
         });
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test deleted', null, res);
     }
-    async getPracticeTestById(id, res) {
+    async getPracticeTestById(id, userId, res) {
         const practiceTest = await this.prismaService.practiceTest.findUnique({
             where: {
                 id,
@@ -127,6 +127,14 @@ let PracticeTestService = class PracticeTestService {
         if (!practiceTest) {
             throw new common_1.NotFoundException('Practice Test not found');
         }
+        await this.prismaService.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                lastTakenTestId: id,
+            },
+        });
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
     }
     async getAllTest(res, page, limit) {
@@ -157,6 +165,44 @@ let PracticeTestService = class PracticeTestService {
                 totalPages: Math.ceil(totalCount / limit),
                 limit,
             },
+        }, res);
+    }
+    async trackPracticeTestProgress(practiceTestId, chapterId, completed, userId, res) {
+        await this.prismaService.userProgress.upsert({
+            where: {
+                userId_chapterId: { userId, chapterId },
+            },
+            update: { completed },
+            create: { userId, chapterId, completed },
+        });
+        const totalChapters = await this.prismaService.chapter.count({
+            where: {
+                practiceTestId,
+            },
+        });
+        const completedChapters = await this.prismaService.userProgress.count({
+            where: {
+                userId,
+                chapterId,
+                completed: true,
+            },
+        });
+        const progress = Math.floor(completedChapters / totalChapters);
+        await this.prismaService.practiceTestProgress.upsert({
+            where: {
+                userId_practiceTestId: { userId, practiceTestId },
+            },
+            update: { progress, lastPlayedChapterId: chapterId },
+            create: {
+                userId,
+                practiceTestId,
+                progress,
+                lastPlayedChapterId: chapterId,
+            },
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Progress updated', {
+            progress: progress * 100,
+            lastPlayedChapterId: chapterId,
         }, res);
     }
     async createCategory(createCategoryDto, res) {
@@ -256,7 +302,7 @@ let PracticeTestService = class PracticeTestService {
             totalPracticeTests: category._count.PracticeTest,
         })), res);
     }
-    async getPracticeTestByCategory(categoryId, res) {
+    async getPracticeTestByCategory(categoryId, userId, res) {
         const practiceTests = await this.prismaService.practiceTest.findMany({
             where: {
                 categoryId,
@@ -269,10 +315,46 @@ let PracticeTestService = class PracticeTestService {
                 },
             },
         });
+        console.log(practiceTests);
         if (!practiceTests) {
             throw new common_1.NotFoundException('Practice Tests not found');
         }
-        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Tests found', practiceTests, res);
+        const progressRecord = await this.prismaService.practiceTestProgress.findMany({
+            where: {
+                userId,
+                practiceTestId: {
+                    in: practiceTests.map((test) => test.id),
+                },
+            },
+        });
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                lastTakenTestId: true,
+            },
+        });
+        const progressMap = progressRecord.reduce((acc, record) => {
+            acc[record.practiceTestId] = record;
+            return acc;
+        }, {});
+        const tests = practiceTests.map((test) => {
+            const progressRecord = progressMap[test.id];
+            const progress = progressRecord ? progressRecord.progress : 0;
+            const lastPlayedChapterId = progressRecord
+                ? progressRecord.lastPlayedChapterId
+                : null;
+            return {
+                id: test.id,
+                title: test.title,
+                description: test.description,
+                lastTakenTest: user?.lastTakenTestId === test.id,
+                progress,
+                lastPlayedChapter: lastPlayedChapterId,
+            };
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Tests found', { practiceTests: tests }, res);
     }
     async getTestByCategoryName(category, res) {
         console.log(category);

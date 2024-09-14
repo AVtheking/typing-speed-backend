@@ -130,7 +130,7 @@ export class AuthService {
     }
 
     if (!this.otpService.checkExpiration(OTP)) {
-      this.otpService.deleteOtp(email);
+      await this.otpService.deleteOtp(email);
 
       throw new BadRequestException('OTP expired');
     }

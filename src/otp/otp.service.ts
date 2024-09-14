@@ -27,6 +27,7 @@ export class OtpService {
     const otpTime = otp?.createdAt;
 
     const diff = currentTime.getTime() - otpTime.getTime();
+
     //if the difference is less than 1 minute then return true
     return diff < 60000;
   }

@@ -7,13 +7,14 @@ import {
   Post,
   Put,
   Query,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { PracticeTestService } from './practice_test.service';
 import { CreatePracticeTestDto } from './dto/create-practice_test.dto';
 
-import { AdminGuard } from 'src/guards';
+import { AdminGuard, AuthGuard } from 'src/guards';
 import { Response } from 'express';
 import {
   ApiBearerAuth,
@@ -124,15 +125,6 @@ export class PracticeTestController {
               createdAt: '2024-08-31T12:34:56.789Z',
               updatedAt: '2024-08-31T12:34:56.789Z',
             },
-            {
-              id: 'cuid_generated_id_2',
-              title: 'Typing techniques',
-              embedCode: 'k k s s ',
-              layout: 'LineLayout',
-              practiceTestId: 'cuid_generated_id',
-              createdAt: '2024-08-31T12:34:56.789Z',
-              updatedAt: '2024-08-31T12:34:56.789Z',
-            },
           ],
         },
       },
@@ -196,23 +188,51 @@ export class PracticeTestController {
     return this.practiceTestService.getAllTest(res, page, limit);
   }
 
-  @Get('practiceTest/:id')
+  @UseGuards(AuthGuard)
+  @Get('practiceTest/')
   @ApiTags('Practice Test')
-  async getTestById(@Param('id') id: string, @Res() res: Response) {
-    return this.practiceTestService.getPracticeTestById(id, res);
+  @ApiBearerAuth('JWT')
+  async getTestById(
+    @Query('id') id: string,
+    @Res() res: Response,
+    @Req() req: any,
+  ) {
+    const userId = req.user;
+    return this.practiceTestService.getPracticeTestById(id, userId, res);
   }
 
   @ApiTags('Practice Test')
+  @UseGuards(AuthGuard)
   @Get('practiceTest/:categoryId')
+  @ApiBearerAuth('JWT')
   async getTestByCategory(
     @Param('categoryId') categoryId: string,
     @Res() res: Response,
+    @Req() req: any,
   ) {
-    return this.practiceTestService.getPracticeTestByCategory(categoryId, res);
+    const userId = req.user;
+    return this.practiceTestService.getPracticeTestByCategory(
+      categoryId,
+      userId,
+      res,
+    );
   }
 
+  // @ApiTags('Practice Test')
+  // @Put('practiceTest/lastTaken/:id')
+  // @UseGuards(AuthGuard)
+  // @ApiBearerAuth('JWT')
+  // async updateLastTaken(
+  //   @Param('id') id: string,
+  //   @Req() req: any,
+  //   @Res() res: Response,
+  // ) {
+  //   const userId = req.user;
+  //   return this.practiceTestService.updateLastTakenTest(id, userId, res);
+  // }
+
   @ApiTags('Practice Test')
-  @Get('practiceTest')
+  @Get('practiceTest/category')
   async getTestByCategoryName(
     @Query('category') category: string,
     @Res() res: Response,
@@ -220,12 +240,24 @@ export class PracticeTestController {
     return this.practiceTestService.getTestByCategoryName(category, res);
   }
 
-  // @ApiTags('Practice Test')
-  // @Get('practiceTest/:level')
-  // async getTestByLevel(
-  //   @Param('level') level: Difficulty,
-  //   @Res() res: Response,
-  // ) {
-  //   return this.practiceTestService.getTestByDifficulty(level, res);
-  // }
+  @UseGuards(AuthGuard)
+  @ApiTags('Practice Test')
+  @Put('practiceTest/trackProgress/')
+  @ApiBearerAuth('JWT')
+  async updateChapterCompleted(
+    @Query('practiceTestId') practiceTestId: string,
+    @Query('chapterId') chapterId: string,
+    @Query('completed') completed: boolean,
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const userId = req.user;
+    return this.practiceTestService.trackPracticeTestProgress(
+      practiceTestId,
+      chapterId,
+      completed,
+      userId,
+      res,
+    );
+  }
 }

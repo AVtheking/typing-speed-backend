@@ -40,7 +40,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Embedded code of the chapter',
-        example: 'jjjj aaa as pp',
+        example: 'j j j j a a a',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsDefined)(),

@@ -67,7 +67,7 @@ let AuthService = class AuthService {
             throw new common_1.NotFoundException('OTP not found');
         }
         if (!this.otpService.checkExpiration(OTP)) {
-            this.otpService.deleteOtp(email);
+            await this.otpService.deleteOtp(email);
             throw new common_1.BadRequestException('OTP expired');
         }
         if (OTP.otp != otp) {
