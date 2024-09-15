@@ -155,10 +155,14 @@ export class PracticeTestService {
     );
   }
   //return specific practice test by id
-  async getPracticeTestById(id: string, userId: string, res: Response) {
+  async getPracticeTestById(
+    practiceTestId: string,
+    userId: string,
+    res: Response,
+  ) {
     const practiceTest = await this.prismaService.practiceTest.findUnique({
       where: {
-        id,
+        id: practiceTestId,
       },
       include: {
         Chapter: true,
@@ -174,15 +178,55 @@ export class PracticeTestService {
         id: userId,
       },
       data: {
-        lastTakenTestId: id,
+        lastTakenTestId: practiceTestId,
       },
     });
+
+    const progressRecord =
+      await this.prismaService.practiceTestProgress.findUnique({
+        where: {
+          userId_practiceTestId: {
+            userId,
+            practiceTestId,
+          },
+        },
+      });
+
+    const chapterProgress = await this.prismaService.userProgress.findMany({
+      where: {
+        userId: userId,
+        chapter: {
+          practiceTestId: practiceTestId,
+        },
+      },
+    });
+
+    // Create a map of chapter completion statuses for quick lookup
+    const progressMap = chapterProgress.reduce((acc, progress) => {
+      acc[progress.chapterId] = progress.completed;
+      return acc;
+    }, {});
+
+    const chapterWithProgress = practiceTest.Chapter.map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+      embedCode: chapter.embedCode,
+      layout: chapter.layout,
+      completed: progressMap[chapter.id] || false,
+    }));
+
+    const response = {
+      ...practiceTest,
+      Chapter: chapterWithProgress,
+      progress: progressRecord?.progress || 0,
+      lastPlayedChapter: progressRecord?.lastPlayedChapterId || null,
+    };
 
     return this.util.sendHttpResponse(
       true,
       HttpStatus.OK,
       'Practice Test found',
-      practiceTest,
+      response,
       res,
     );
   }
@@ -487,7 +531,6 @@ export class PracticeTestService {
         },
       },
     });
-    console.log(practiceTests);
 
     if (!practiceTests) {
       throw new NotFoundException('Practice Tests not found');

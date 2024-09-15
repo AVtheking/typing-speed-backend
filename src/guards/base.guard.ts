@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 export class BaseGuard implements CanActivate {
   private readonly logger = new Logger();
@@ -13,6 +14,7 @@ export class BaseGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private jwtSecret: any,
+    private prismaService: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,7 +29,14 @@ export class BaseGuard implements CanActivate {
         const decodedToken = this.jwtService.verify(token, {
           secret: this.jwtSecret,
         });
-
+        const user = await this.prismaService.user.findUnique({
+          where: {
+            id: decodedToken.userId,
+          },
+        });
+        if (!user) {
+          throw new UnauthorizedException('User not found');
+        }
         request.user = decodedToken.userId;
 
         return true;
@@ -36,7 +45,9 @@ export class BaseGuard implements CanActivate {
         const elapsed = Date.now() - start; // Elapsed time in milliseconds
         this.logRequest(request, 401, elapsed); // Log the failed request
 
-        throw new UnauthorizedException('Invalid token');
+        throw new UnauthorizedException(
+          `Invalid token error: ${error.message}`,
+        );
       }
     } else {
       const elapsed = Date.now() - start; // Elapsed time in milliseconds

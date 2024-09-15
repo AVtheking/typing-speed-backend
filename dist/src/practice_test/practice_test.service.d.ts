@@ -11,7 +11,7 @@ export declare class PracticeTestService {
     createTest(createPracticeTestDto: CreatePracticeTestDto, res: Response): Promise<Response<any, Record<string, any>>>;
     updateTest(id: string, updatePracticeTestDto: UpdatePracticeTestDto, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteTest(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
-    getPracticeTestById(id: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getPracticeTestById(practiceTestId: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllTest(res: Response, page: number, limit: number): Promise<Response<any, Record<string, any>>>;
     trackPracticeTestProgress(practiceTestId: string, chapterId: string, completed: boolean, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     createCategory(createCategoryDto: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;

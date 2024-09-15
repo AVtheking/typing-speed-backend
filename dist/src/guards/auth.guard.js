@@ -14,14 +14,15 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const base_guard_1 = require("./base.guard");
 const config_1 = require("../config");
+const prisma_service_1 = require("../prisma/prisma.service");
 let AuthGuard = class AuthGuard extends base_guard_1.BaseGuard {
-    constructor(jwtService) {
-        super(jwtService, config_1.Env.jwtAccessSecret);
+    constructor(jwtService, prismaService) {
+        super(jwtService, config_1.Env.jwtAccessSecret, prismaService);
     }
 };
 exports.AuthGuard = AuthGuard;
 exports.AuthGuard = AuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
+    __metadata("design:paramtypes", [jwt_1.JwtService, prisma_service_1.PrismaService])
 ], AuthGuard);
 //# sourceMappingURL=auth.guard.js.map

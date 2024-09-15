@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseGuard = void 0;
 const common_1 = require("@nestjs/common");
 class BaseGuard {
-    constructor(jwtService, jwtSecret) {
+    constructor(jwtService, jwtSecret, prismaService) {
         this.jwtService = jwtService;
         this.jwtSecret = jwtSecret;
+        this.prismaService = prismaService;
         this.logger = new common_1.Logger();
     }
     async canActivate(context) {
@@ -17,6 +18,14 @@ class BaseGuard {
                 const decodedToken = this.jwtService.verify(token, {
                     secret: this.jwtSecret,
                 });
+                const user = await this.prismaService.user.findUnique({
+                    where: {
+                        id: decodedToken.userId,
+                    },
+                });
+                if (!user) {
+                    throw new common_1.UnauthorizedException('User not found');
+                }
                 request.user = decodedToken.userId;
                 return true;
             }
@@ -24,7 +33,7 @@ class BaseGuard {
                 console.log(error);
                 const elapsed = Date.now() - start;
                 this.logRequest(request, 401, elapsed);
-                throw new common_1.UnauthorizedException('Invalid token');
+                throw new common_1.UnauthorizedException(`Invalid token error: ${error.message}`);
             }
         }
         else {

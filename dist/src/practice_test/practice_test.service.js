@@ -115,10 +115,10 @@ let PracticeTestService = class PracticeTestService {
         });
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test deleted', null, res);
     }
-    async getPracticeTestById(id, userId, res) {
+    async getPracticeTestById(practiceTestId, userId, res) {
         const practiceTest = await this.prismaService.practiceTest.findUnique({
             where: {
-                id,
+                id: practiceTestId,
             },
             include: {
                 Chapter: true,
@@ -132,10 +132,43 @@ let PracticeTestService = class PracticeTestService {
                 id: userId,
             },
             data: {
-                lastTakenTestId: id,
+                lastTakenTestId: practiceTestId,
             },
         });
-        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', practiceTest, res);
+        const progressRecord = await this.prismaService.practiceTestProgress.findUnique({
+            where: {
+                userId_practiceTestId: {
+                    userId,
+                    practiceTestId,
+                },
+            },
+        });
+        const chapterProgress = await this.prismaService.userProgress.findMany({
+            where: {
+                userId: userId,
+                chapter: {
+                    practiceTestId: practiceTestId,
+                },
+            },
+        });
+        const progressMap = chapterProgress.reduce((acc, progress) => {
+            acc[progress.chapterId] = progress.completed;
+            return acc;
+        }, {});
+        const chapterWithProgress = practiceTest.Chapter.map((chapter) => ({
+            id: chapter.id,
+            title: chapter.title,
+            embedCode: chapter.embedCode,
+            layout: chapter.layout,
+            completed: progressMap[chapter.id] || false,
+        }));
+        const response = {
+            ...practiceTest,
+            Chapter: chapterWithProgress,
+            progress: progressRecord?.progress || 0,
+            lastPlayedChapter: progressRecord?.lastPlayedChapterId || null,
+        };
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', response, res);
     }
     async getAllTest(res, page, limit) {
         const skip = (page - 1) * limit;
@@ -315,7 +348,6 @@ let PracticeTestService = class PracticeTestService {
                 },
             },
         });
-        console.log(practiceTests);
         if (!practiceTests) {
             throw new common_1.NotFoundException('Practice Tests not found');
         }
