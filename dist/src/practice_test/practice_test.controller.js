@@ -98,7 +98,7 @@ __decorate([
         summary: 'Retrieve all categories',
         description: 'Fetch a list of all practice test categories.',
     }),
-    (0, common_1.Get)('/categoriesf'),
+    (0, common_1.Get)('/categories'),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
