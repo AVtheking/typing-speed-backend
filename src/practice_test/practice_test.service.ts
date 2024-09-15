@@ -469,14 +469,15 @@ export class PracticeTestService {
       },
     });
 
+    const categoriesData = categories.map((category) => ({
+      ...category,
+      totalPracticeTests: category._count.PracticeTest,
+    }));
     return this.util.sendHttpResponse(
       true,
       HttpStatus.OK,
       'Categories found',
-      categories.map((category) => ({
-        ...category,
-        totalPracticeTests: category._count.PracticeTest,
-      })),
+      { categories: categoriesData },
       res,
     );
   }

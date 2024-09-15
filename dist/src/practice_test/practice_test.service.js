@@ -330,10 +330,11 @@ let PracticeTestService = class PracticeTestService {
                 },
             },
         });
-        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Categories found', categories.map((category) => ({
+        const categoriesData = categories.map((category) => ({
             ...category,
             totalPracticeTests: category._count.PracticeTest,
-        })), res);
+        }));
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Categories found', { categories: categoriesData }, res);
     }
     async getPracticeTestByCategory(categoryId, userId, res) {
         const practiceTests = await this.prismaService.practiceTest.findMany({
