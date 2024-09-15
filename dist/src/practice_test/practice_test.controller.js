@@ -76,11 +76,15 @@ exports.PracticeTestController = PracticeTestController;
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
-    (0, common_1.Post)('/admin/createCategory'),
+    (0, common_1.Post)('/admin/category'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Create a new category',
+        description: 'Create a new practice test category with the provided data.',
+    }),
     (0, swagger_1.ApiBody)({
         type: create_category_dto_1.CreateCategoryDto,
-        description: 'Practice test data to create a new category ',
+        description: 'Practice test data to create a new category',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
@@ -90,7 +94,11 @@ __decorate([
 ], PracticeTestController.prototype, "createCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Category'),
-    (0, common_1.Get)('/allCategories'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Retrieve all categories',
+        description: 'Fetch a list of all practice test categories.',
+    }),
+    (0, common_1.Get)('/category'),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -98,6 +106,10 @@ __decorate([
 ], PracticeTestController.prototype, "getAllCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get category by ID',
+        description: 'Retrieve a specific category using its unique identifier.',
+    }),
     (0, common_1.Get)('category/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
@@ -107,6 +119,10 @@ __decorate([
 ], PracticeTestController.prototype, "getCategoryById", null);
 __decorate([
     (0, swagger_1.ApiTags)('Category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get category by name',
+        description: 'Retrieve a specific category using its name.',
+    }),
     (0, common_1.Get)('category'),
     __param(0, (0, common_1.Query)('name')),
     __param(1, (0, common_1.Res)()),
@@ -117,8 +133,12 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
-    (0, common_1.Put)('/admin/updateCategory/:id'),
+    (0, common_1.Put)('/admin/category/:id'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Update a category',
+        description: 'Update an existing practice test category with the provided data.',
+    }),
     (0, swagger_1.ApiBody)({
         type: create_category_dto_1.CreateCategoryDto,
         description: 'Practice test data to update a category',
@@ -132,9 +152,13 @@ __decorate([
 ], PracticeTestController.prototype, "updateCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
-    (0, common_1.Delete)('/admin/deleteCategory/:id'),
+    (0, common_1.Delete)('/admin/category/:id'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Delete a category',
+        description: 'Remove a practice test category by its ID.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -143,10 +167,14 @@ __decorate([
 ], PracticeTestController.prototype, "deleteCategory", null);
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
-    (0, common_1.Post)('/admin/createPracticeTest'),
+    (0, common_1.Post)('/admin/practice-test'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, swagger_1.ApiConsumes)('application/json'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Create a new practice test',
+        description: 'Create a new practice test with the provided data.',
+    }),
     (0, swagger_1.ApiBody)({
         type: create_practice_test_dto_1.CreatePracticeTestDto,
         description: 'Practice test data to create a new practice test',
@@ -207,11 +235,15 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
-    (0, common_1.Put)('/admin/updatePracticeTest/:id'),
+    (0, common_1.Put)('/admin/practice-test/:id'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Update a practice test',
+        description: 'Update an existing practice test with the provided data.',
+    }),
     (0, swagger_1.ApiBody)({
         type: update_practice_test_dto_1.UpdatePracticeTestDto,
-        description: 'Practice test data to update a  practice test',
+        description: 'Practice test data to update a practice test',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('id')),
@@ -221,10 +253,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PracticeTestController.prototype, "updatePracticeTest", null);
 __decorate([
-    (0, common_1.Delete)('/admin/deletePracticeTest/:id'),
     (0, swagger_1.ApiTags)('Admin'),
+    (0, common_1.Delete)('/admin/practice-test/:id'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Delete a practice test',
+        description: 'Remove a practice test by its ID.',
+    }),
+    (0, swagger_1.ApiBody)({
+        description: 'Delete a practice test',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -233,7 +272,11 @@ __decorate([
 ], PracticeTestController.prototype, "deletePracticeTest", null);
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
-    (0, common_1.Get)('practiceTest/all'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Retrieve all practice tests',
+        description: 'Fetch a paginated list of all available practice tests.',
+    }),
+    (0, common_1.Get)('practice-test/all'),
     __param(0, (0, common_1.Query)('page')),
     __param(1, (0, common_1.Query)('limit')),
     __param(2, (0, common_1.Res)()),
@@ -243,9 +286,13 @@ __decorate([
 ], PracticeTestController.prototype, "getAllTest", null);
 __decorate([
     (0, common_1.UseGuards)(guards_1.AuthGuard),
-    (0, common_1.Get)('practiceTest/'),
+    (0, common_1.Get)('practice-test/'),
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get a practice test by ID',
+        description: 'Retrieve detailed information of a specific practice test by its ID.',
+    }),
     __param(0, (0, common_1.Query)('id')),
     __param(1, (0, common_1.Res)()),
     __param(2, (0, common_1.Req)()),
@@ -256,8 +303,12 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.UseGuards)(guards_1.AuthGuard),
-    (0, common_1.Get)('practiceTest/:categoryId'),
+    (0, common_1.Get)('category/practice-test/:categoryId'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get practice tests by category ID',
+        description: 'Retrieve all practice tests under a specific category using the category ID.',
+    }),
     __param(0, (0, common_1.Param)('categoryId')),
     __param(1, (0, common_1.Res)()),
     __param(2, (0, common_1.Req)()),
@@ -268,8 +319,12 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.UseGuards)(guards_1.AuthGuard),
-    (0, common_1.Get)('practiceTest/category'),
+    (0, common_1.Get)('category/practice-test'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get practice tests by category name',
+        description: 'Retrieve all practice tests under a specific category using the category name.',
+    }),
     __param(0, (0, common_1.Query)('category')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -279,8 +334,12 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(guards_1.AuthGuard),
     (0, swagger_1.ApiTags)('Practice Test'),
-    (0, common_1.Put)('practiceTest/trackProgress/'),
+    (0, common_1.Put)('practice-test/progress/'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Update chapter completion status',
+        description: 'Update the completion status of a specific chapter within a practice test.',
+    }),
     __param(0, (0, common_1.Query)('practiceTestId')),
     __param(1, (0, common_1.Query)('chapterId')),
     __param(2, (0, common_1.Query)('completed')),

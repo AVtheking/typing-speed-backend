@@ -22,6 +22,7 @@ import {
   ApiConsumes,
   ApiResponse,
   ApiTags,
+  ApiOperation, // Added import
 } from '@nestjs/swagger';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -33,11 +34,15 @@ export class PracticeTestController {
 
   @ApiTags('Admin')
   @UseGuards(AdminGuard)
-  @Post('/admin/createCategory')
+  @Post('/admin/category')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Create a new category',
+    description: 'Create a new practice test category with the provided data.',
+  })
   @ApiBody({
     type: CreateCategoryDto,
-    description: 'Practice test data to create a new category ',
+    description: 'Practice test data to create a new category',
   })
   createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -47,18 +52,30 @@ export class PracticeTestController {
   }
 
   @ApiTags('Category')
-  @Get('/allCategories')
+  @ApiOperation({
+    summary: 'Retrieve all categories',
+    description: 'Fetch a list of all practice test categories.',
+  })
+  @Get('/category')
   async getAllCategory(@Res() res: Response) {
     return this.practiceTestService.getAllCategories(res);
   }
 
   @ApiTags('Category')
+  @ApiOperation({
+    summary: 'Get category by ID',
+    description: 'Retrieve a specific category using its unique identifier.',
+  })
   @Get('category/:id')
   async getCategoryById(@Param('id') id: string, @Res() res: Response) {
     return this.practiceTestService.getCategoryById(id, res);
   }
 
   @ApiTags('Category')
+  @ApiOperation({
+    summary: 'Get category by name',
+    description: 'Retrieve a specific category using its name.',
+  })
   @Get('category')
   async getCategoryByName(@Query('name') name: string, @Res() res: Response) {
     return this.practiceTestService.getCategoryByName(name, res);
@@ -66,8 +83,13 @@ export class PracticeTestController {
 
   @ApiTags('Admin')
   @UseGuards(AdminGuard)
-  @Put('/admin/updateCategory/:id')
+  @Put('/admin/category/:id')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Update a category',
+    description:
+      'Update an existing practice test category with the provided data.',
+  })
   @ApiBody({
     type: CreateCategoryDto,
     description: 'Practice test data to update a category',
@@ -81,18 +103,26 @@ export class PracticeTestController {
   }
 
   @ApiTags('Admin')
-  @Delete('/admin/deleteCategory/:id')
+  @Delete('/admin/category/:id')
   @UseGuards(AdminGuard)
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Delete a category',
+    description: 'Remove a practice test category by its ID.',
+  })
   async deleteCategory(@Param('id') id: string, @Res() res: Response) {
     return this.practiceTestService.deleteCategory(id, res);
   }
 
   @ApiTags('Admin')
-  @Post('/admin/createPracticeTest')
+  @Post('/admin/practice-test')
   @UseGuards(AdminGuard)
   @ApiConsumes('application/json')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Create a new practice test',
+    description: 'Create a new practice test with the provided data.',
+  })
   @ApiBody({
     type: CreatePracticeTestDto,
     description: 'Practice test data to create a new practice test',
@@ -154,11 +184,15 @@ export class PracticeTestController {
 
   @ApiTags('Admin')
   @UseGuards(AdminGuard)
-  @Put('/admin/updatePracticeTest/:id')
+  @Put('/admin/practice-test/:id')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Update a practice test',
+    description: 'Update an existing practice test with the provided data.',
+  })
   @ApiBody({
     type: UpdatePracticeTestDto,
-    description: 'Practice test data to update a  practice test',
+    description: 'Practice test data to update a practice test',
   })
   updatePracticeTest(
     @Body() updatePracticeTestDto: UpdatePracticeTestDto,
@@ -168,16 +202,27 @@ export class PracticeTestController {
     return this.practiceTestService.updateTest(id, updatePracticeTestDto, res);
   }
 
-  @Delete('/admin/deletePracticeTest/:id')
   @ApiTags('Admin')
+  @Delete('/admin/practice-test/:id')
   @UseGuards(AdminGuard)
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Delete a practice test',
+    description: 'Remove a practice test by its ID.',
+  })
+  @ApiBody({
+    description: 'Delete a practice test',
+  })
   async deletePracticeTest(@Param('id') id: string, @Res() res: Response) {
     return this.practiceTestService.deleteTest(id, res);
   }
 
   @ApiTags('Practice Test')
-  @Get('practiceTest/all')
+  @ApiOperation({
+    summary: 'Retrieve all practice tests',
+    description: 'Fetch a paginated list of all available practice tests.',
+  })
+  @Get('practice-test/all')
   async getAllTest(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -189,9 +234,14 @@ export class PracticeTestController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('practiceTest/')
+  @Get('practice-test/')
   @ApiTags('Practice Test')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Get a practice test by ID',
+    description:
+      'Retrieve detailed information of a specific practice test by its ID.',
+  })
   async getTestById(
     @Query('id') id: string,
     @Res() res: Response,
@@ -203,8 +253,13 @@ export class PracticeTestController {
 
   @ApiTags('Practice Test')
   @UseGuards(AuthGuard)
-  @Get('practiceTest/:categoryId')
+  @Get('category/practice-test/:categoryId')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Get practice tests by category ID',
+    description:
+      'Retrieve all practice tests under a specific category using the category ID.',
+  })
   async getTestByCategory(
     @Param('categoryId') categoryId: string,
     @Res() res: Response,
@@ -218,10 +273,15 @@ export class PracticeTestController {
     );
   }
 
+  // Uncomment and add ApiOperation if needed
   // @ApiTags('Practice Test')
   // @Put('practiceTest/lastTaken/:id')
   // @UseGuards(AuthGuard)
   // @ApiBearerAuth('JWT')
+  // @ApiOperation({
+  //   summary: 'Update last taken test',
+  //   description: 'Update the last taken timestamp for a specific practice test.',
+  // })
   // async updateLastTaken(
   //   @Param('id') id: string,
   //   @Req() req: any,
@@ -233,8 +293,13 @@ export class PracticeTestController {
 
   @ApiTags('Practice Test')
   @UseGuards(AuthGuard)
-  @Get('practiceTest/category')
+  @Get('category/practice-test')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Get practice tests by category name',
+    description:
+      'Retrieve all practice tests under a specific category using the category name.',
+  })
   async getTestByCategoryName(
     @Query('category') category: string,
     @Res() res: Response,
@@ -244,8 +309,13 @@ export class PracticeTestController {
 
   @UseGuards(AuthGuard)
   @ApiTags('Practice Test')
-  @Put('practiceTest/trackProgress/')
+  @Put('practice-test/progress/')
   @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Update chapter completion status',
+    description:
+      'Update the completion status of a specific chapter within a practice test.',
+  })
   async updateChapterCompleted(
     @Query('practiceTestId') practiceTestId: string,
     @Query('chapterId') chapterId: string,

@@ -272,39 +272,6 @@ export class PracticeTestService {
     );
   }
 
-  // async updateLastTakenTest(
-  //   practiceTestId: string,
-  //   userId: string,
-  //   res: Response,
-  // ) {
-  //   const practiceTest = await this.prismaService.practiceTest.findUnique({
-  //     where: {
-  //       id: practiceTestId,
-  //     },
-  //   });
-
-  //   if (!practiceTest) {
-  //     throw new NotFoundException('Practice Test not found');
-  //   }
-
-  //   await this.prismaService.user.update({
-  //     where: {
-  //       id: userId,
-  //     },
-  //     data: {
-  //       lastTakenTestId: practiceTestId,
-  //     },
-  //   });
-
-  //   return this.util.sendHttpResponse(
-  //     true,
-  //     HttpStatus.OK,
-  //     'Last taken test updated',
-  //     null,
-  //     res,
-  //   );
-  // }
-
   async trackPracticeTestProgress(
     practiceTestId: string,
     chapterId: string,
