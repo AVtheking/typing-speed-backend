@@ -56,7 +56,7 @@ export class PracticeTestController {
     summary: 'Retrieve all categories',
     description: 'Fetch a list of all practice test categories.',
   })
-  @Get('/categories')
+  @Get('/categoriesf')
   async getAllCategory(@Res() res: Response) {
     return this.practiceTestService.getAllCategories(res);
   }
