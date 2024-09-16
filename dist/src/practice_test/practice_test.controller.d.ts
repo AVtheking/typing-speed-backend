@@ -8,7 +8,6 @@ export declare class PracticeTestController {
     constructor(practiceTestService: PracticeTestService);
     createCategory(createCategoryDto: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllCategory(res: Response): Promise<Response<any, Record<string, any>>>;
-    getCategoryById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getCategoryByName(name: string, res: Response): Promise<Response<any, Record<string, any>>>;
     updateCategory(createCategoryDto: CreateCategoryDto, id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteCategory(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
@@ -18,6 +17,7 @@ export declare class PracticeTestController {
     getAllTest(page: number | undefined, limit: number | undefined, res: Response): Promise<Response<any, Record<string, any>>>;
     getTestById(id: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategory(categoryId: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
-    getTestByCategoryName(category: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestByCategoryName(category: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     updateChapterCompleted(practiceTestId: string, chapterId: string, completed: boolean, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    getCategoryById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }

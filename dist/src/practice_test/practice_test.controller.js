@@ -30,9 +30,6 @@ let PracticeTestController = class PracticeTestController {
     async getAllCategory(res) {
         return this.practiceTestService.getAllCategories(res);
     }
-    async getCategoryById(id, res) {
-        return this.practiceTestService.getCategoryById(id, res);
-    }
     async getCategoryByName(name, res) {
         return this.practiceTestService.getCategoryByName(name, res);
     }
@@ -64,12 +61,16 @@ let PracticeTestController = class PracticeTestController {
         const userId = req.user;
         return this.practiceTestService.getPracticeTestByCategory(categoryId, userId, res);
     }
-    async getTestByCategoryName(category, res) {
-        return this.practiceTestService.getTestByCategoryName(category, res);
+    async getTestByCategoryName(category, res, req) {
+        const userId = req.user;
+        return this.practiceTestService.getTestByCategoryName(category, userId, res);
     }
     async updateChapterCompleted(practiceTestId, chapterId, completed, req, res) {
         const userId = req.user;
         return this.practiceTestService.trackPracticeTestProgress(practiceTestId, chapterId, completed, userId, res);
+    }
+    async getCategoryById(id, res) {
+        return this.practiceTestService.getCategoryById(id, res);
     }
 };
 exports.PracticeTestController = PracticeTestController;
@@ -104,19 +105,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getAllCategory", null);
-__decorate([
-    (0, swagger_1.ApiTags)('Category'),
-    (0, swagger_1.ApiOperation)({
-        summary: 'Get category by ID',
-        description: 'Retrieve a specific category using its unique identifier.',
-    }),
-    (0, common_1.Get)('category/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PracticeTestController.prototype, "getCategoryById", null);
 __decorate([
     (0, swagger_1.ApiTags)('Category'),
     (0, swagger_1.ApiOperation)({
@@ -327,8 +315,9 @@ __decorate([
     }),
     __param(0, (0, common_1.Query)('category')),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategoryName", null);
 __decorate([
@@ -349,6 +338,19 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Boolean, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "updateChapterCompleted", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get category by ID',
+        description: 'Retrieve a specific category using its unique identifier.',
+    }),
+    (0, common_1.Get)('category/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getCategoryById", null);
 exports.PracticeTestController = PracticeTestController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [practice_test_service_1.PracticeTestService])

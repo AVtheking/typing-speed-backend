@@ -63,16 +63,6 @@ export class PracticeTestController {
 
   @ApiTags('Category')
   @ApiOperation({
-    summary: 'Get category by ID',
-    description: 'Retrieve a specific category using its unique identifier.',
-  })
-  @Get('category/:id')
-  async getCategoryById(@Param('id') id: string, @Res() res: Response) {
-    return this.practiceTestService.getCategoryById(id, res);
-  }
-
-  @ApiTags('Category')
-  @ApiOperation({
     summary: 'Get category by name',
     description: 'Retrieve a specific category using its name.',
   })
@@ -303,8 +293,14 @@ export class PracticeTestController {
   async getTestByCategoryName(
     @Query('category') category: string,
     @Res() res: Response,
+    @Req() req: any,
   ) {
-    return this.practiceTestService.getTestByCategoryName(category, res);
+    const userId = req.user;
+    return this.practiceTestService.getTestByCategoryName(
+      category,
+      userId,
+      res,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -331,5 +327,15 @@ export class PracticeTestController {
       userId,
       res,
     );
+  }
+
+  @ApiTags('Category')
+  @ApiOperation({
+    summary: 'Get category by ID',
+    description: 'Retrieve a specific category using its unique identifier.',
+  })
+  @Get('category/:id')
+  async getCategoryById(@Param('id') id: string, @Res() res: Response) {
+    return this.practiceTestService.getCategoryById(id, res);
   }
 }

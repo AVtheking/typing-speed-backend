@@ -139,7 +139,7 @@ export class AuthService {
     }
 
     //deleting the otp after being used
-    this.otpService.deleteOtp(email);
+    await this.otpService.deleteOtp(email);
 
     //find user by email from usersService
     let user = await this.usersService.getUserByEmail(email);

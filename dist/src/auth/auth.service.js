@@ -73,7 +73,7 @@ let AuthService = class AuthService {
         if (OTP.otp != otp) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
-        this.otpService.deleteOtp(email);
+        await this.otpService.deleteOtp(email);
         let user = await this.usersService.getUserByEmail(email);
         if (!user) {
             throw new common_1.NotFoundException('User not found');
