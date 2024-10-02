@@ -3,12 +3,11 @@ import { CreatePracticeTestDto } from './dto/create-practice_test.dto';
 import { Response } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
+import { SaveTestResultDto } from './dto/save-result.dto';
 export declare class PracticeTestController {
     private practiceTestService;
     constructor(practiceTestService: PracticeTestService);
     createCategory(createCategoryDto: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;
-    getAllCategory(res: Response): Promise<Response<any, Record<string, any>>>;
-    getCategoryByName(name: string, res: Response): Promise<Response<any, Record<string, any>>>;
     updateCategory(createCategoryDto: CreateCategoryDto, id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteCategory(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     createTest(createPracticeTestDto: CreatePracticeTestDto, res: Response): Promise<Response<any, Record<string, any>>>;
@@ -18,6 +17,10 @@ export declare class PracticeTestController {
     getTestById(id: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategory(categoryId: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategoryName(category: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
+    saveTestResult(saveTestResultDto: SaveTestResultDto, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestResult(practiceTestId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     updateChapterCompleted(practiceTestId: string, chapterId: string, completed: boolean, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    getAllCategory(res: Response): Promise<Response<any, Record<string, any>>>;
+    getCategoryByName(name: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getCategoryById(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }

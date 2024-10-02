@@ -20,18 +20,13 @@ const guards_1 = require("../guards");
 const swagger_1 = require("@nestjs/swagger");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_practice_test_dto_1 = require("./dto/update-practice_test.dto");
+const save_result_dto_1 = require("./dto/save-result.dto");
 let PracticeTestController = class PracticeTestController {
     constructor(practiceTestService) {
         this.practiceTestService = practiceTestService;
     }
     createCategory(createCategoryDto, res) {
         return this.practiceTestService.createCategory(createCategoryDto, res);
-    }
-    async getAllCategory(res) {
-        return this.practiceTestService.getAllCategories(res);
-    }
-    async getCategoryByName(name, res) {
-        return this.practiceTestService.getCategoryByName(name, res);
     }
     updateCategory(createCategoryDto, id, res) {
         return this.practiceTestService.updateCategory(id, createCategoryDto, res);
@@ -65,9 +60,23 @@ let PracticeTestController = class PracticeTestController {
         const userId = req.user;
         return this.practiceTestService.getTestByCategoryName(category, userId, res);
     }
+    async saveTestResult(saveTestResultDto, req, res) {
+        const userId = req.user;
+        return this.practiceTestService.saveResult(saveTestResultDto, userId, res);
+    }
+    async getTestResult(practiceTestId, req, res) {
+        const userId = req.user;
+        return this.practiceTestService.getLastTwoTests(practiceTestId, userId, res);
+    }
     async updateChapterCompleted(practiceTestId, chapterId, completed, req, res) {
         const userId = req.user;
         return this.practiceTestService.trackPracticeTestProgress(practiceTestId, chapterId, completed, userId, res);
+    }
+    async getAllCategory(res) {
+        return this.practiceTestService.getAllCategories(res);
+    }
+    async getCategoryByName(name, res) {
+        return this.practiceTestService.getCategoryByName(name, res);
     }
     async getCategoryById(id, res) {
         return this.practiceTestService.getCategoryById(id, res);
@@ -93,31 +102,6 @@ __decorate([
     __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, Object]),
     __metadata("design:returntype", void 0)
 ], PracticeTestController.prototype, "createCategory", null);
-__decorate([
-    (0, swagger_1.ApiTags)('Category'),
-    (0, swagger_1.ApiOperation)({
-        summary: 'Retrieve all categories',
-        description: 'Fetch a list of all practice test categories.',
-    }),
-    (0, common_1.Get)('/categories'),
-    __param(0, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], PracticeTestController.prototype, "getAllCategory", null);
-__decorate([
-    (0, swagger_1.ApiTags)('Category'),
-    (0, swagger_1.ApiOperation)({
-        summary: 'Get category by name',
-        description: 'Retrieve a specific category using its name.',
-    }),
-    (0, common_1.Get)('category'),
-    __param(0, (0, common_1.Query)('name')),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PracticeTestController.prototype, "getCategoryByName", null);
 __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.UseGuards)(guards_1.AdminGuard),
@@ -321,6 +305,45 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestByCategoryName", null);
 __decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, common_1.Post)('practice-test/result'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Save practice test result',
+        description: 'Save the result of a practice test taken by the user.',
+    }),
+    (0, swagger_1.ApiBody)({
+        type: save_result_dto_1.SaveTestResultDto,
+        description: 'Practice test result data',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [save_result_dto_1.SaveTestResultDto, Object, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "saveTestResult", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Practice Test'),
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, common_1.Get)('practice-test/result'),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Save practice test result',
+        description: 'Save the result of a practice test taken by the user.',
+    }),
+    (0, swagger_1.ApiBody)({
+        description: 'Fetch last 2 attempts of a practice test',
+    }),
+    __param(0, (0, common_1.Query)('practiceTestId')),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getTestResult", null);
+__decorate([
     (0, common_1.UseGuards)(guards_1.AuthGuard),
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.Put)('practice-test/progress/'),
@@ -338,6 +361,31 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Boolean, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "updateChapterCompleted", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Retrieve all categories',
+        description: 'Fetch a list of all practice test categories.',
+    }),
+    (0, common_1.Get)('/categories'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getAllCategory", null);
+__decorate([
+    (0, swagger_1.ApiTags)('Category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get category by name',
+        description: 'Retrieve a specific category using its name.',
+    }),
+    (0, common_1.Get)('category'),
+    __param(0, (0, common_1.Query)('name')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PracticeTestController.prototype, "getCategoryByName", null);
 __decorate([
     (0, swagger_1.ApiTags)('Category'),
     (0, swagger_1.ApiOperation)({

@@ -335,6 +335,9 @@ export class AuthService {
    */
 
   async refreshToken(res: Response, userId: string): Promise<Response> {
+    if (!Env.jwtAccessSecret) {
+      throw new InternalServerErrorException('Access secret not defined');
+    }
     const accessToken = await this.generateToken(
       userId,
       Env.jwtAccessSecret,

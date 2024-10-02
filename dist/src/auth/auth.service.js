@@ -152,6 +152,9 @@ let AuthService = class AuthService {
         return this.utlis.sendHttpResponse(true, common_1.HttpStatus.OK, 'Password changed successfully', null, res);
     }
     async refreshToken(res, userId) {
+        if (!config_1.Env.jwtAccessSecret) {
+            throw new common_1.InternalServerErrorException('Access secret not defined');
+        }
         const accessToken = await this.generateToken(userId, config_1.Env.jwtAccessSecret, '10d');
         const responseData = (0, class_transformer_1.plainToInstance)(dto_1.ResponseUserDto, {
             accessToken,

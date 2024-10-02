@@ -119,7 +119,7 @@ __decorate([
 ], AuthController.prototype, "verifyOtp", null);
 __decorate([
     (0, common_1.UseGuards)(guards_1.ResetPasswordGuard),
-    (0, common_1.Post)('changePassword'),
+    (0, common_1.Patch)('changePassword'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
     (0, swagger_1.ApiBody)({
         type: dto_1.ResetPasswordDto,

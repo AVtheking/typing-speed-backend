@@ -5,5 +5,6 @@ export declare class UserController {
     private readonly userService;
     constructor(userService: UsersService);
     getUser(req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    getUserAgain(req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     changeEmail(req: any, res: Response, body: ChangeEmailDto): Promise<Response<any, Record<string, any>>>;
 }

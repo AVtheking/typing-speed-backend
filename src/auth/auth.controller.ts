@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   CreateUserDto,
@@ -62,7 +70,7 @@ export class AuthController {
   }
 
   @UseGuards(ResetPasswordGuard)
-  @Post('changePassword')
+  @Patch('changePassword')
   @ApiBearerAuth('JWT')
   @ApiBody({
     type: ResetPasswordDto,

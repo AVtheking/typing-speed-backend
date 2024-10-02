@@ -170,6 +170,22 @@ let PracticeTestService = class PracticeTestService {
         };
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', response, res);
     }
+    async getLastTwoTests(userId, practiceTestId, res) {
+        const lastTwoTests = await this.prismaService.userTestResult.findMany({
+            where: {
+                userId,
+                practiceTestId,
+            },
+            orderBy: {
+                completedAt: 'desc',
+            },
+            include: {
+                UserKeyPressed: true,
+            },
+            take: 2,
+        });
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Last two result found', lastTwoTests, res);
+    }
     async getAllTest(res, page, limit) {
         const skip = (page - 1) * limit;
         const [practiceTests, totalCount] = await Promise.all([
@@ -237,6 +253,49 @@ let PracticeTestService = class PracticeTestService {
             progress: progress * 100,
             lastPlayedChapterId: chapterId,
         }, res);
+    }
+    async saveResult(saveTestResultDto, userId, res) {
+        const { practiceTestId, wpm, accuracy, time, raw, correct, incorrect, extras, missed, keyPressStats, } = saveTestResultDto;
+        const practiceTest = await this.prismaService.practiceTest.findUnique({
+            where: {
+                id: practiceTestId,
+            },
+        });
+        if (!practiceTest) {
+            throw new common_1.NotFoundException('Practice Test not found');
+        }
+        const previousAttemptCount = await this.prismaService.userTestResult.count({
+            where: {
+                userId,
+                practiceTestId,
+            },
+        });
+        const currentAttempt = previousAttemptCount + 1;
+        const result = await this.prismaService.userTestResult.create({
+            data: {
+                userId,
+                practiceTestId,
+                wpm,
+                accuracy,
+                time,
+                raw,
+                correct,
+                incorrect,
+                extras,
+                missed,
+            },
+        });
+        for (const stat of keyPressStats) {
+            await this.prismaService.userKeyPressed.create({
+                data: {
+                    userTestResultId: result.id,
+                    attempt: currentAttempt,
+                    key: stat.key,
+                    difficultyScore: stat.difficultyScore,
+                },
+            });
+        }
+        return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Result saved', result, res);
     }
     async createCategory(createCategoryDto, res) {
         const { name } = createCategoryDto;
@@ -349,7 +408,7 @@ let PracticeTestService = class PracticeTestService {
                 },
             },
         });
-        if (!practiceTests) {
+        if (!practiceTests || practiceTests.length === 0) {
             throw new common_1.NotFoundException('Practice Tests not found');
         }
         const progressRecord = await this.prismaService.practiceTestProgress.findMany({

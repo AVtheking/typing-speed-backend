@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
 import { PracticeTestProgress } from '@prisma/client';
+import { SaveTestResultDto } from './dto/save-result.dto';
 
 @Injectable()
 export class PracticeTestService {
@@ -231,6 +232,29 @@ export class PracticeTestService {
     );
   }
 
+  async getLastTwoTests(userId: string, practiceTestId: string, res: Response) {
+    const lastTwoTests = await this.prismaService.userTestResult.findMany({
+      where: {
+        userId,
+        practiceTestId,
+      },
+      orderBy: {
+        completedAt: 'desc',
+      },
+      include: {
+        UserKeyPressed: true,
+      },
+      take: 2,
+    });
+    return this.util.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Last two result found',
+      lastTwoTests,
+      res,
+    );
+  }
+
   //return all practice tests
   //paginated data
 
@@ -324,6 +348,79 @@ export class PracticeTestService {
         progress: progress * 100,
         lastPlayedChapterId: chapterId,
       },
+      res,
+    );
+  }
+
+  async saveResult(
+    saveTestResultDto: SaveTestResultDto,
+    userId: string,
+    res: Response,
+  ) {
+    const {
+      practiceTestId,
+      wpm,
+      accuracy,
+      time,
+      raw,
+      correct,
+      incorrect,
+      extras,
+      missed,
+      keyPressStats,
+    } = saveTestResultDto;
+
+    const practiceTest = await this.prismaService.practiceTest.findUnique({
+      where: {
+        id: practiceTestId,
+      },
+    });
+
+    if (!practiceTest) {
+      throw new NotFoundException('Practice Test not found');
+    }
+
+    const previousAttemptCount =
+      await this.prismaService.userPracticeTestResult.count({
+        where: {
+          userId,
+          practiceTestId,
+        },
+      });
+
+    const currentAttempt = previousAttemptCount + 1;
+
+    const result = await this.prismaService.userPracticeTestResult.create({
+      data: {
+        userId,
+        practiceTestId,
+        wpm,
+        accuracy,
+        time,
+        raw,
+        correct,
+        incorrect,
+        extras,
+        missed,
+      },
+    });
+
+    for (const stat of keyPressStats) {
+      await this.prismaService.userKeyPressed.create({
+        data: {
+          userTestResultId: result.id,
+          attempt: currentAttempt,
+          key: stat.key,
+          difficultyScore: stat.difficultyScore,
+        },
+      });
+    }
+
+    return this.util.sendHttpResponse(
+      true,
+      HttpStatus.CREATED,
+      'Result saved',
+      result,
       res,
     );
   }
@@ -500,7 +597,7 @@ export class PracticeTestService {
       },
     });
 
-    if (!practiceTests) {
+    if (!practiceTests || practiceTests.length === 0) {
       throw new NotFoundException('Practice Tests not found');
     }
     const progressRecord =

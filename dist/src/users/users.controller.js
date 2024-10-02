@@ -26,6 +26,10 @@ let UserController = class UserController {
         const userId = req.user;
         return this.userService.getUserById(userId, res);
     }
+    async getUserAgain(req, res) {
+        const userId = req.user;
+        return this.userService.getUserById(userId, res);
+    }
     async changeEmail(req, res, body) {
         const userId = req.user;
         const { email } = body;
@@ -41,6 +45,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUser", null);
+__decorate([
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserAgain", null);
 __decorate([
     (0, common_1.Put)('/change-email'),
     (0, swagger_1.ApiBody)({ type: change_email_dto_1.ChangeEmailDto }),

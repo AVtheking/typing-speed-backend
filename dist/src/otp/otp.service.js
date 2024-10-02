@@ -24,7 +24,7 @@ let OtpService = class OtpService {
         });
     }
     async deleteOtp(email) {
-        return this.prisma.otp.delete({
+        this.prisma.otp.delete({
             where: {
                 email,
             },
@@ -34,7 +34,8 @@ let OtpService = class OtpService {
         const currentTime = new Date();
         const otpTime = otp?.createdAt;
         const diff = currentTime.getTime() - otpTime.getTime();
-        return diff < 60000;
+        const expirationThreshold = 60000;
+        return diff < expirationThreshold;
     }
     async generateOtp(email) {
         const otp = Math.floor(100000 + Math.random() * 900000);

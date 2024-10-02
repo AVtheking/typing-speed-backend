@@ -27,11 +27,13 @@ import {
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
+import { SaveTestResultDto } from './dto/save-result.dto';
 
 @Controller()
 export class PracticeTestController {
   constructor(private practiceTestService: PracticeTestService) {}
 
+  //----------------------Admin Endpoints----------------------//
   @ApiTags('Admin')
   @UseGuards(AdminGuard)
   @Post('/admin/category')
@@ -49,26 +51,6 @@ export class PracticeTestController {
     @Res() res: Response,
   ) {
     return this.practiceTestService.createCategory(createCategoryDto, res);
-  }
-
-  @ApiTags('Category')
-  @ApiOperation({
-    summary: 'Retrieve all categories',
-    description: 'Fetch a list of all practice test categories.',
-  })
-  @Get('/categories')
-  async getAllCategory(@Res() res: Response) {
-    return this.practiceTestService.getAllCategories(res);
-  }
-
-  @ApiTags('Category')
-  @ApiOperation({
-    summary: 'Get category by name',
-    description: 'Retrieve a specific category using its name.',
-  })
-  @Get('category')
-  async getCategoryByName(@Query('name') name: string, @Res() res: Response) {
-    return this.practiceTestService.getCategoryByName(name, res);
   }
 
   @ApiTags('Admin')
@@ -223,6 +205,7 @@ export class PracticeTestController {
     return this.practiceTestService.getAllTest(res, page, limit);
   }
 
+  //----------------------Practice Test Endpoints----------------------//
   @UseGuards(AuthGuard)
   @Get('practice-test/')
   @ApiTags('Practice Test')
@@ -263,24 +246,6 @@ export class PracticeTestController {
     );
   }
 
-  // Uncomment and add ApiOperation if needed
-  // @ApiTags('Practice Test')
-  // @Put('practiceTest/lastTaken/:id')
-  // @UseGuards(AuthGuard)
-  // @ApiBearerAuth('JWT')
-  // @ApiOperation({
-  //   summary: 'Update last taken test',
-  //   description: 'Update the last taken timestamp for a specific practice test.',
-  // })
-  // async updateLastTaken(
-  //   @Param('id') id: string,
-  //   @Req() req: any,
-  //   @Res() res: Response,
-  // ) {
-  //   const userId = req.user;
-  //   return this.practiceTestService.updateLastTakenTest(id, userId, res);
-  // }
-
   @ApiTags('Practice Test')
   @UseGuards(AuthGuard)
   @Get('category/practice-test')
@@ -298,6 +263,51 @@ export class PracticeTestController {
     const userId = req.user;
     return this.practiceTestService.getTestByCategoryName(
       category,
+      userId,
+      res,
+    );
+  }
+
+  @ApiTags('Practice Test')
+  @UseGuards(AuthGuard)
+  @Post('practice-test/result')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Save practice test result',
+    description: 'Save the result of a practice test taken by the user.',
+  })
+  @ApiBody({
+    type: SaveTestResultDto,
+    description: 'Practice test result data',
+  })
+  async saveTestResult(
+    @Body() saveTestResultDto: SaveTestResultDto,
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const userId = req.user;
+    return this.practiceTestService.saveResult(saveTestResultDto, userId, res);
+  }
+
+  @ApiTags('Practice Test')
+  @UseGuards(AuthGuard)
+  @Get('practice-test/result')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Save practice test result',
+    description: 'Save the result of a practice test taken by the user.',
+  })
+  @ApiBody({
+    description: 'Fetch last 2 attempts of a practice test',
+  })
+  async getTestResult(
+    @Query('practiceTestId') practiceTestId: string,
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const userId = req.user;
+    return this.practiceTestService.getLastTwoTests(
+      practiceTestId,
       userId,
       res,
     );
@@ -329,6 +339,26 @@ export class PracticeTestController {
     );
   }
 
+  //----------------------Category Endpoints----------------------//
+  @ApiTags('Category')
+  @ApiOperation({
+    summary: 'Retrieve all categories',
+    description: 'Fetch a list of all practice test categories.',
+  })
+  @Get('/categories')
+  async getAllCategory(@Res() res: Response) {
+    return this.practiceTestService.getAllCategories(res);
+  }
+
+  @ApiTags('Category')
+  @ApiOperation({
+    summary: 'Get category by name',
+    description: 'Retrieve a specific category using its name.',
+  })
+  @Get('category')
+  async getCategoryByName(@Query('name') name: string, @Res() res: Response) {
+    return this.practiceTestService.getCategoryByName(name, res);
+  }
   @ApiTags('Category')
   @ApiOperation({
     summary: 'Get category by ID',
