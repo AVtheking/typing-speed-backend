@@ -91,6 +91,13 @@ export class AuthService {
       return;
     }
     const otp = await this.otpService.generateOtp(signUp.email);
+
+    if (!otp) {
+      throw new InternalServerErrorException('Error generating OTP');
+    }
+
+    //TODO: Use a queue to send the email
+
     this.mailer.sendEmailVerificationMail(signUp.email, otp);
 
     const responseData = plainToInstance(SignUpResponseDto, {
@@ -123,7 +130,7 @@ export class AuthService {
     }
 
     if (!this.otpService.checkExpiration(OTP)) {
-      this.otpService.deleteOtp(email);
+      await this.otpService.deleteOtp(email);
 
       throw new BadRequestException('OTP expired');
     }
@@ -142,7 +149,7 @@ export class AuthService {
     }
 
     if (user.verified) {
-      throw new BadRequestException('Email already verified');
+      throw new BadRequestException('Email already registered');
     }
 
     //updates the verified field of the user
@@ -231,6 +238,8 @@ export class AuthService {
     }
     //generating the otp and sending it to mail
     const otp = await this.otpService.generateOtp(email);
+
+    //TODO: use a queue to send the email
     this.mailer.sendForgetPasswordMail(email, otp);
 
     return this.utlis.sendHttpResponse(
@@ -262,12 +271,14 @@ export class AuthService {
       throw new BadRequestException('OTP expired');
     }
 
+    //checking if the otp is valid or not
     if (OTP.otp != otp) {
       throw new BadRequestException('Invalid OTP');
     }
 
     //deleting the otp after it is verified
-    await this.otpService.deleteOtp(email);
+    //delete otp asyncronously
+    this.otpService.deleteOtp(email);
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
@@ -275,7 +286,7 @@ export class AuthService {
     }
 
     if (!user.verified) {
-      throw new UnauthorizedException('Email not verified');
+      throw new UnauthorizedException('User with this email does not exist');
     }
 
     //generating the token to reset password
@@ -324,6 +335,9 @@ export class AuthService {
    */
 
   async refreshToken(res: Response, userId: string): Promise<Response> {
+    if (!Env.jwtAccessSecret) {
+      throw new InternalServerErrorException('Access secret not defined');
+    }
     const accessToken = await this.generateToken(
       userId,
       Env.jwtAccessSecret,
@@ -369,7 +383,7 @@ export class AuthService {
         id: data.sub,
       };
 
-      return await this.googleSignIn(user, res);
+      return this.googleSignIn(user, res);
     }
   }
 
@@ -386,7 +400,7 @@ export class AuthService {
     const userExists = await this.usersService.getUserByEmail(user.email);
     const password = this.utlis.randomPassword();
     if (!userExists) {
-      return await this.registerOauthUser(
+      return this.registerOauthUser(
         {
           email: user.email,
           username: user.username,
@@ -460,6 +474,7 @@ export class AuthService {
       accessToken,
       refreshToken,
     });
+
     return this.utlis.sendHttpResponse(
       true,
       HttpStatus.CREATED,
@@ -506,7 +521,6 @@ export class AuthService {
     if (!isPasswordMatch) {
       throw new UnauthorizedException('Invalid password');
     }
-
     if (!Env.jwtAdminSecret) {
       throw new InternalServerErrorException('Access secret is not defined');
     }
