@@ -32,7 +32,6 @@ let AdminController = class AdminController {
         const currentSetting = await this.adminService.getSettings();
         if (file) {
             const s3Response = await this.adminService.uploadFile(file);
-            console.log('s3Response', s3Response);
             cleanedData.logoImage = s3Response?.Location ?? undefined;
         }
         else {

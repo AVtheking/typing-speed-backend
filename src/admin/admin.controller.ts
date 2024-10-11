@@ -122,7 +122,6 @@ export class AdminController {
 
     if (file) {
       const s3Response = await this.adminService.uploadFile(file);
-      console.log('s3Response', s3Response);
       cleanedData.logoImage = s3Response?.Location ?? undefined;
     } else {
       cleanedData.logoImage = currentSetting?.logoImage ?? undefined;

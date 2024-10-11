@@ -35,7 +35,6 @@ export class AdminService implements OnModuleInit {
   }
 
   async uploadFile(file) {
-    console.log(file);
     const { originalname } = file;
 
     return await this.s3_upload(

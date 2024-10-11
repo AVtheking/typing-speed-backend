@@ -29,14 +29,7 @@ export class BaseGuard implements CanActivate {
         const decodedToken = this.jwtService.verify(token, {
           secret: this.jwtSecret,
         });
-        // const user = await this.prismaService.user.findUnique({
-        //   where: {
-        //     id: decodedToken.userId,
-        //   },
-        // });
-        // if (!user) {
-        //   throw new UnauthorizedException('User not found');
-        // }
+
         request.user = decodedToken.userId;
 
         return true;
