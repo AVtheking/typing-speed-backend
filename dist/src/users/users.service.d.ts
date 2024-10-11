@@ -1,17 +1,28 @@
 import { User } from '@prisma/client';
 import { Response } from 'express';
-import { LoginUserDto, CreateUserDto } from '../auth/dto';
+import { LoginUserDto, CreateUserDto, VerifyOtpDto } from '../auth/dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Utils } from '../utils/utils';
+import { SaveTestResultDto } from './dto/save-test-result.dto';
+import { OtpService } from 'src/otp/otp.service';
+import { Mailer } from 'src/utils/Mailer';
 export declare class UsersService {
     private prisma;
+    private otpService;
     private utils;
-    constructor(prisma: PrismaService, utils: Utils);
-    getUserById(id: string, res: Response): Promise<Response>;
+    private mailer;
+    constructor(prisma: PrismaService, otpService: OtpService, utils: Utils, mailer: Mailer);
+    getUserById(id: string, res: Response | null): Promise<Response | User>;
     createUser(data: CreateUserDto): Promise<User | Response>;
     updateUser(id: string, data: any): Promise<User>;
     updateUserVerificationStatus(id: string): Promise<User>;
     updateUserPassword(id: string, password: string): Promise<User>;
+    updateUserEmail(id: string, email: string): Promise<User>;
     loginUser(userData: LoginUserDto): Promise<User | Response>;
     getUserByEmail(email: string): Promise<User | null>;
+    changeEmail(id: string, email: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    verifyEmail(data: VerifyOtpDto, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    saveTestResult(userId: string, saveTestResultDto: SaveTestResultDto, res: Response): Promise<Response<any, Record<string, any>>>;
+    uploadProfileImage(file: any, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    changePassword(userId: string, newPassword: string, res: Response): Promise<Response<any, Record<string, any>>>;
 }

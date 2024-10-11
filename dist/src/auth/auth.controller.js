@@ -24,40 +24,44 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async SignUp(userData, res) {
-        return await this.authService.signUp(userData, res);
+    async signUp(userData, res) {
+        return this.authService.signUp(userData, res);
     }
     async verifyEmail(data, res) {
-        return await this.authService.verifyEmail(data, res);
+        return this.authService.verifyEmail(data, res);
     }
-    async SignIn(userData, res) {
-        return await this.authService.signIn(userData, res);
+    async signIn(userData, res) {
+        return this.authService.signIn(userData, res);
     }
     async forgetPassword(data, res) {
-        return await this.authService.forgetPassword(data, res);
+        return this.authService.forgetPassword(data, res);
     }
     async verifyOtp(otpData, res) {
-        return await this.authService.verfiyOtp(otpData, res);
+        return this.authService.verfiyOtp(otpData, res);
     }
     async changePassword(resetData, res, req) {
-        return await this.authService.changePassword(resetData, res, req.user);
+        return this.authService.changePassword(resetData, res, req.user);
     }
     async refreshToken(req, res) {
         const userId = req.user;
-        return await this.authService.refreshToken(res, userId);
+        return this.authService.refreshToken(res, userId);
     }
-    async googeleTokenExchange(googleTokenExchangeDto, res) {
-        return await this.authService.tokenExchange(googleTokenExchangeDto, res);
+    async googleTokenExchange(googleTokenExchangeDto, res) {
+        return this.authService.tokenExchange(googleTokenExchangeDto, res);
     }
-    async signUp(userData, res) {
-        return await this.authService.signUpAdmin(userData, res);
+    async adminSignUp(userData, res) {
+        return this.authService.signUpAdmin(userData, res);
     }
-    async signIn(userData, res) {
-        return await this.authService.loginAdmin(userData, res);
+    async adminSignIn(userData, res) {
+        return this.authService.loginAdmin(userData, res);
     }
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: 'Sign up a new user',
+        description: 'Registers a new user and returns the user details.',
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.CreateUserDto,
         description: 'User data to create a new user',
@@ -68,13 +72,17 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [dto_1.CreateUserDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "SignUp", null);
+], AuthController.prototype, "signUp", null);
 __decorate([
-    (0, common_1.Post)('verifyEmail'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Verify user email',
+        description: 'Verifies the user email by checking the OTP sent to the email.',
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.VerifyOtpDto,
         description: 'Email and OTP to verify the email',
     }),
+    (0, common_1.Post)('verifyEmail'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -82,23 +90,31 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "verifyEmail", null);
 __decorate([
-    (0, common_1.Post)('signIn'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'User login',
+        description: 'Logs in a user by validating their credentials and returns a JWT token.',
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.LoginUserDto,
         description: 'User data to login',
     }),
+    (0, common_1.Post)('signIn'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [dto_1.LoginUserDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "SignIn", null);
+], AuthController.prototype, "signIn", null);
 __decorate([
-    (0, common_1.Post)('forgetPassword'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Request password reset',
+        description: "Sends a password reset OTP to the user's email address.",
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.ForgetPasswordDto,
-        description: 'Email to send the OTP',
+        description: 'Email to send the OTP for password reset',
     }),
+    (0, common_1.Post)('forgetPassword'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -106,11 +122,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "forgetPassword", null);
 __decorate([
-    (0, common_1.Post)('verifyOtp'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Verify OTP for password reset',
+        description: 'Verifies the OTP sent for resetting the password.',
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.VerifyOtpDto,
-        description: 'Email and OTP to verify the email',
+        description: 'Email and OTP to verify for password reset',
     }),
+    (0, common_1.Post)('verifyOtp'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -119,12 +139,16 @@ __decorate([
 ], AuthController.prototype, "verifyOtp", null);
 __decorate([
     (0, common_1.UseGuards)(guards_1.ResetPasswordGuard),
-    (0, common_1.Post)('changePassword'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Change user password',
+        description: 'Allows the user to change their password using the reset token.',
+    }),
     (0, swagger_1.ApiBearerAuth)('JWT'),
     (0, swagger_1.ApiBody)({
         type: dto_1.ResetPasswordDto,
-        description: 'New password to change the password',
+        description: "New password to reset the user's password",
     }),
+    (0, common_1.Patch)('changePassword'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __param(2, (0, common_1.Req)()),
@@ -134,8 +158,12 @@ __decorate([
 ], AuthController.prototype, "changePassword", null);
 __decorate([
     (0, common_1.UseGuards)(guards_1.RefreshTokenGuard),
-    (0, common_1.Post)('refreshToken'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Refresh JWT token',
+        description: 'Refreshes the JWT token for the authenticated user.',
+    }),
     (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, common_1.Post)('refreshToken'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -143,41 +171,54 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refreshToken", null);
 __decorate([
-    (0, common_1.Post)('exchange'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Exchange Google token',
+        description: 'Exchanges Google OAuth token for application authentication.',
+    }),
     (0, swagger_1.ApiBody)({
         type: google_exchange_dto_1.GoogleTokenExchangeDto,
-        description: 'New password to change the password',
+        description: 'Google token to exchange for application authentication',
     }),
+    (0, common_1.Post)('exchange'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [google_exchange_dto_1.GoogleTokenExchangeDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "googeleTokenExchange", null);
+], AuthController.prototype, "googleTokenExchange", null);
 __decorate([
-    (0, common_1.Post)('admin/signUp'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Sign up a new admin',
+        description: 'Registers a new admin and returns the admin details.',
+    }),
     (0, swagger_1.ApiBody)({
         type: dto_1.CreateUserDto,
         description: 'Admin data to create a new admin',
     }),
+    (0, common_1.Post)('admin/signUp'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [dto_1.CreateUserDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "signUp", null);
+], AuthController.prototype, "adminSignUp", null);
 __decorate([
-    (0, common_1.Post)('admin/signIn'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Admin login',
+        description: 'Logs in an admin by validating their credentials and returns a JWT token.',
+    }),
+    (0, swagger_1.ApiTags)('Admin'),
     (0, swagger_1.ApiBody)({
         type: createAdmin_dto_1.AdminDto,
         description: 'Admin data to login',
     }),
+    (0, common_1.Post)('admin/signIn'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [createAdmin_dto_1.AdminDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "signIn", null);
+], AuthController.prototype, "adminSignIn", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),

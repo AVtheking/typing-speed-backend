@@ -43,16 +43,41 @@ enum Layout {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String                   @id @default(cuid())
+  email                  String                   @unique
+  username               String                   @unique
+  password               String
+  profileImage           String?
+  verified               Boolean                  @default(false)
+  matchPlayed            Int                      @default(0)
+  matchWon               Int                      @default(0)
+  matchLost              Int                      @default(0)
+  avgWpm                 Int                      @default(0)
+  avgAccuracy            Int                      @default(0)
+  rank                   Int?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  lastTakenTestId        String?
+  lastTakenTest          PracticeTest?            @relation(fields: [lastTakenTestId], references: [id])
+  Test                   Test[]
+  UserProgress           UserProgress[]
+  PracticeTestProgress   PracticeTestProgress[]
+  UserTestResult         UserTestResult[]
+  UserPracticeTestResult UserPracticeTestResult[]
+  LeaderBoard            LeaderBoard[]
 
   @@index([email, username, id])
   @@map("users")
+}
+
+model Test {
+  id       String @id @default(cuid())
+  userId   String
+  speed    Int
+  accuracy Int
+  time     Int
+  rawSpeed Int
+  User     User   @relation(fields: [userId], references: [id])
 }
 
 model Otp {
@@ -96,32 +121,156 @@ model AdminSettings {
   @@map("admin_settings")
 }
 
+model Category {
+  id              String         @id @default(cuid())
+  name            String         @unique
+  description     String
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  PracticeTest    PracticeTest[]
+
+  @@index([id])
+  @@map("categories")
+}
+
 model PracticeTest {
-  id                  String     @id @default(cuid())
-  title               String
-  description         String
-  titleAndDescription String
-  metaTitle           String
-  metaDescription     String
-  difficulty          Difficulty
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-  Chapter             Chapter[]
+  id                     String                   @id @default(cuid())
+  title                  String                   @unique
+  description            String
+  titleAndDescription    String
+  metaTitle              String
+  metaDescription        String
+  videoTag               String?
+  categoryId             String
+  categoryName           String
+  category               Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  Chapter                Chapter[]
+  PracticeTestProgress   PracticeTestProgress[]
+  User                   User[]
+  UserPracticeTestResult UserPracticeTestResult[]
 
   @@index([id])
   @@map("lessons")
 }
 
 model Chapter {
-  id             String       @id @default(cuid())
-  title          String
-  description    String
-  layout         Layout
-  practiceTest   PracticeTest @relation(fields: [practiceTestId], references: [id])
-  practiceTestId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id                   String                 @id @default(cuid())
+  title                String
+  embedCode            String
+  layout               Layout
+  practiceTest         PracticeTest           @relation(fields: [practiceTestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  practiceTestId       String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  UserProgress         UserProgress[]
+  PracticeTestProgress PracticeTestProgress[]
 
   @@index([id])
   @@map("chapters")
+}
+
+model UserProgress {
+  id        String  @id @default(cuid())
+  userId    String
+  chapterId String
+  completed Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id])
+  chapter   Chapter @relation(fields: [chapterId], references: [id])
+
+  @@unique([userId, chapterId])
+}
+
+model PracticeTestProgress {
+  id                  String       @id @default(cuid())
+  userId              String
+  practiceTestId      String
+  lastPlayedChapterId String?
+  progress            Float        @default(0.0)
+  user                User         @relation(fields: [userId], references: [id])
+  practiceTest        PracticeTest @relation(fields: [practiceTestId], references: [id])
+  lastPlayedChapter   Chapter?     @relation(fields: [lastPlayedChapterId], references: [id])
+
+  @@unique([userId, practiceTestId])
+}
+
+model UserPracticeTestResult {
+  id             String           @id @default(cuid())
+  userId         String
+  practiceTestId String
+  wpm            Int
+  accuracy       Int
+  time           Int
+  raw            Int
+  correct        Int
+  incorrect      Int
+  extras         Int
+  missed         Int
+  completedAt    DateTime         @default(now())
+  user           User             @relation(fields: [userId], references: [id])
+  practiceTest   PracticeTest     @relation(fields: [practiceTestId], references: [id])
+  UserKeyPressed UserKeyPressed[]
+}
+
+model UserKeyPressed {
+  id                       String                 @id @default(uuid())
+  userPracticeTestResultId String
+  attempt                  Int
+  difficultyScore          Int
+  key                      String
+  userPracticeTestResult   UserPracticeTestResult @relation(fields: [userPracticeTestResultId], references: [id])
+}
+
+model UserTestResult {
+  id          String   @id @default(cuid())
+  userId      String
+  wpm         Int
+  accuracy    Int
+  time        Int
+  raw         Int
+  correct     Int
+  incorrect   Int
+  extras      Int
+  missed      Int
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardDaily {
+  id       String   @id @default(cuid())
+  userId   String
+  score    Int
+  wpm      Int
+  raw      Int
+  accuracy Int
+  date     DateTime
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardWeekly {
+  id        String   @id @default(cuid())
+  userId    String
+  score     Int
+  wpm       Int
+  raw       Int
+  accuracy  Int
+  startDate DateTime
+  endDate   DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardMonthly {
+  id        String @id @default(cuid())
+  userId    String
+  score     Int
+  wpm       Int
+  raw       Int
+  accuracy  Int
+  startDate Int
+  endDate   Int
+  user      User   @relation(fields: [userId], references: [id])
 }

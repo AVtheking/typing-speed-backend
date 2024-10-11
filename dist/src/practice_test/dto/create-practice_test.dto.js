@@ -39,13 +39,13 @@ __decorate([
 ], CreateChapterDto.prototype, "title", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Description of the chapter',
-        example: 'This chapter covers the basics of typing.',
+        description: 'Embedded code of the chapter',
+        example: 'j j j j a a a',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsDefined)(),
     __metadata("design:type", String)
-], CreateChapterDto.prototype, "description", void 0);
+], CreateChapterDto.prototype, "embedCode", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Layout type for the chapter',
@@ -107,9 +107,29 @@ __decorate([
         enum: Difficulty,
         example: Difficulty.Beginner,
     }),
-    (0, class_validator_1.IsEnum)(Difficulty),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsDefined)(),
     __metadata("design:type", String)
-], CreatePracticeTestDto.prototype, "difficulty", void 0);
+], CreatePracticeTestDto.prototype, "categoryId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Category name of the practice test',
+        example: 'Typing Basics',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsDefined)(),
+    __metadata("design:type", String)
+], CreatePracticeTestDto.prototype, "categoryName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({
+        description: 'Video tag for the practice test',
+        example: 'video-tag',
+        required: false,
+    }),
+    __metadata("design:type", String)
+], CreatePracticeTestDto.prototype, "videoTag", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'List of chapters included in the practice test',

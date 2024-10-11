@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging/logging.interceptor';
 
 import { AuthModule } from './auth/auth.module';
@@ -16,14 +16,26 @@ import { AdminModule } from './admin/admin.module';
 import { PracticeTestModule } from './practice_test/practice_test.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'uploads'),
     }),
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
     }),
 
     AuthModule,
@@ -41,6 +53,7 @@ import { join } from 'path';
       },
     }),
     PracticeTestModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [
@@ -48,6 +61,10 @@ import { join } from 'path';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD, // Apply the ThrottlerGuard globally
+      useClass: ThrottlerGuard,
     },
     PrismaService,
   ],

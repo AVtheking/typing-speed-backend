@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDefined,
   IsEnum,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -30,12 +31,12 @@ export class CreateChapterDto {
   title: string;
 
   @ApiProperty({
-    description: 'Description of the chapter',
-    example: 'This chapter covers the basics of typing.',
+    description: 'Embedded code of the chapter',
+    example: 'j j j j a a a',
   })
   @IsString()
   @IsDefined()
-  description: string;
+  embedCode: string;
 
   @ApiProperty({
     description: 'Layout type for the chapter',
@@ -90,8 +91,26 @@ export class CreatePracticeTestDto {
     enum: Difficulty,
     example: Difficulty.Beginner,
   })
-  @IsEnum(Difficulty)
-  difficulty: Difficulty;
+  @IsString()
+  @IsDefined()
+  categoryId: string;
+
+  @ApiProperty({
+    description: 'Category name of the practice test',
+    example: 'Typing Basics',
+  })
+  @IsString()
+  @IsDefined()
+  categoryName: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'Video tag for the practice test',
+    example: 'video-tag',
+    required: false,
+  })
+  videoTag: string;
 
   @ApiProperty({
     description: 'List of chapters included in the practice test',

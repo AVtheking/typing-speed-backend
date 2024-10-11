@@ -9,6 +9,7 @@ const swagger_1 = require("@nestjs/swagger");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+        snapshot: true,
     });
     app.setGlobalPrefix('api/v1');
     app.useGlobalPipes(new common_1.ValidationPipe({
@@ -24,6 +25,7 @@ async function bootstrap() {
         .setDescription('Typing Speed Test API')
         .setVersion('1.0')
         .addTag('Speed test')
+        .setExternalDoc('Postman Collection', '/api-json')
         .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);

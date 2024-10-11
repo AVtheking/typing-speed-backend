@@ -13,11 +13,45 @@ exports.Utils = void 0;
 const common_1 = require("@nestjs/common");
 const class_transformer_1 = require("class-transformer");
 const bcrypt = require("bcrypt");
+const AWS = require("aws-sdk");
 const constants_1 = require("../auth/constants");
 const response_user_dto_1 = require("../auth/dto/response-user.dto");
 const admin_login_dto_1 = require("../auth/dto/admin-login.dto");
+const config_1 = require("../config");
 let Utils = class Utils {
-    constructor() { }
+    constructor() {
+        this.AWS_S3_BUCKET_NAME = config_1.Env.AWS_BUCKET_NAME;
+        this.s3 = new AWS.S3({
+            accessKeyId: config_1.Env.AWS_ACCESS_KEY,
+            secretAccessKey: config_1.Env.AWS_SECRET_KEY,
+            region: config_1.Env.AWS_REGION,
+        });
+    }
+    async uploadFile(file) {
+        console.log(file);
+        const { originalname } = file;
+        return await this.s3_upload(file.buffer, this.AWS_S3_BUCKET_NAME, originalname, file.mimetype);
+    }
+    async s3_upload(file, bucket, name, mimetype) {
+        const params = {
+            Bucket: bucket,
+            Key: String(name),
+            Body: file,
+            ACL: 'public-read',
+            ContentType: mimetype,
+            ContentDisposition: 'inline',
+            CreateBucketConfiguration: {
+                LocationConstraint: 'ap-south-1',
+            },
+        };
+        try {
+            const s3Response = await this.s3.upload(params).promise();
+            return s3Response;
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
     async sendHttpResponse(success, statusCode, message, data, res) {
         return res.status(statusCode).json({
             success,
@@ -56,11 +90,11 @@ let Utils = class Utils {
     }
     async hashPassword(password) {
         const saltOrRounds = 10;
-        return await bcrypt.hash(password, saltOrRounds);
+        return bcrypt.hash(password, saltOrRounds);
     }
     async comparePassword(password, hashPassword) {
         try {
-            return await bcrypt.compare(password, hashPassword);
+            return bcrypt.compare(password, hashPassword);
         }
         catch (error) {
             console.error('Error comparing password:', error);

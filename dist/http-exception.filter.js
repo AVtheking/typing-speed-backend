@@ -17,9 +17,11 @@ let HttpExceptionFilter = class HttpExceptionFilter {
         const errorResponse = exception.getResponse();
         response.status(status).json({
             success: false,
-            message: Array.isArray(errorResponse.message)
-                ? errorResponse.message[0]
-                : errorResponse.message,
+            message: errorResponse.message
+                ? Array.isArray(errorResponse.message)
+                    ? errorResponse.message[0]
+                    : errorResponse.message
+                : errorResponse,
         });
     }
 };

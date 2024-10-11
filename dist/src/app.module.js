@@ -23,17 +23,29 @@ const admin_module_1 = require("./admin/admin.module");
 const practice_test_module_1 = require("./practice_test/practice_test.module");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
+const throttler_1 = require("@nestjs/throttler");
+const devtools_integration_1 = require("@nestjs/devtools-integration");
+const leaderboard_module_1 = require("./leaderboard/leaderboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            throttler_1.ThrottlerModule.forRoot([
+                {
+                    ttl: 60000,
+                    limit: 10,
+                },
+            ]),
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', '..', 'uploads'),
             }),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+            }),
+            devtools_integration_1.DevtoolsModule.register({
+                http: process.env.NODE_ENV !== 'production',
             }),
             auth_module_1.AuthModule,
             otp_module_1.OtpModule,
@@ -49,6 +61,7 @@ exports.AppModule = AppModule = __decorate([
                 },
             }),
             practice_test_module_1.PracticeTestModule,
+            leaderboard_module_1.LeaderboardModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -56,6 +69,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_INTERCEPTOR,
                 useClass: logging_interceptor_1.LoggingInterceptor,
+            },
+            {
+                provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
             },
             prisma_service_1.PrismaService,
         ],
