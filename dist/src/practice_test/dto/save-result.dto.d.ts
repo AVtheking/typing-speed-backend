@@ -1,13 +1,5 @@
-export declare class SaveTestResultDto {
-    practiceTestId: string;
-    wpm: number;
-    accuracy: number;
-    time: number;
-    raw: number;
-    correct: number;
-    incorrect: number;
-    extras: number;
-    missed: number;
+import { SaveResultDto } from 'src/save-test-result.dto';
+export declare class SavePracticeTestResultDto extends SaveResultDto {
     keyPressStats: {
         key: string;
         difficultyScore: number;

@@ -30,6 +30,7 @@ async function bootstrap() {
     .setDescription('Typing Speed Test API')
     .setVersion('1.0')
     .addTag('Speed test')
+    .setExternalDoc('Postman Collection', '/api-json')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT',

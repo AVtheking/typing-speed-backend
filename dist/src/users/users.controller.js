@@ -18,6 +18,9 @@ const swagger_1 = require("@nestjs/swagger");
 const users_service_1 = require("./users.service");
 const guards_1 = require("../guards");
 const change_email_dto_1 = require("./dto/change-email.dto");
+const save_test_result_dto_1 = require("./dto/save-test-result.dto");
+const platform_express_1 = require("@nestjs/platform-express");
+const verify_otp_dto_1 = require("./dto/verify-otp.dto");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -26,19 +29,33 @@ let UserController = class UserController {
         const userId = req.user;
         return this.userService.getUserById(userId, res);
     }
-    async getUserAgain(req, res) {
-        const userId = req.user;
-        return this.userService.getUserById(userId, res);
-    }
     async changeEmail(req, res, body) {
         const userId = req.user;
         const { email } = body;
         return this.userService.changeEmail(userId, email, res);
     }
+    async verifyEmail(req, res, body) {
+        const userId = req.user;
+        return this.userService.verifyEmail(body, userId, res);
+    }
+    async saveTest(req, res, body) {
+        const userId = req.user;
+        return this.userService.saveTestResult(userId, body, res);
+    }
+    async updateProfileImage(req, res, file) {
+        const userId = req.user;
+        if (file) {
+            return this.userService.uploadProfileImage(file, userId, res);
+        }
+    }
 };
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get user details',
+        description: 'Retrieve user details by user ID from the JWT token.',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -46,14 +63,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUser", null);
 __decorate([
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "getUserAgain", null);
-__decorate([
-    (0, common_1.Put)('/change-email'),
+    (0, common_1.Post)('/change-email'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Change user email',
+        description: 'Allows a user to change their email address.',
+    }),
     (0, swagger_1.ApiBody)({ type: change_email_dto_1.ChangeEmailDto }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
@@ -62,6 +76,71 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, change_email_dto_1.ChangeEmailDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "changeEmail", null);
+__decorate([
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, common_1.Patch)('/verify-email'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Verify email address',
+        description: 'Verifies the OTP for email and updates the email verification status.',
+    }),
+    (0, swagger_1.ApiBody)({ type: verify_otp_dto_1.VerifyOtpDto }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, verify_otp_dto_1.VerifyOtpDto]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "verifyEmail", null);
+__decorate([
+    (0, common_1.UseGuards)(guards_1.AuthGuard),
+    (0, common_1.Post)('/test'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Save test result',
+        description: 'Saves the test result for the logged-in user.',
+    }),
+    (0, swagger_1.ApiBody)({ type: save_test_result_dto_1.SaveTestResultDto }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, save_test_result_dto_1.SaveTestResultDto]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "saveTest", null);
+__decorate([
+    (0, common_1.Patch)('/profile-image'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profileImage')),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Update profile image',
+        description: 'Updates the profile image for the logged-in user. Only JPEG, JPG, and PNG formats are allowed, with a maximum size of 2MB.',
+    }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                profileImage: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'Uploaded profile image',
+                },
+            },
+        },
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder()
+        .addFileTypeValidator({
+        fileType: new RegExp('^image/(jpeg|jpg|png)$'),
+    })
+        .addMaxSizeValidator({ maxSize: 2 * 1024 * 1024 })
+        .build({
+        errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+        fileIsRequired: false,
+    }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateProfileImage", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     (0, swagger_1.ApiTags)('User'),

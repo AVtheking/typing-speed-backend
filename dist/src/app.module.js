@@ -25,6 +25,7 @@ const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const throttler_1 = require("@nestjs/throttler");
 const devtools_integration_1 = require("@nestjs/devtools-integration");
+const leaderboard_module_1 = require("./leaderboard/leaderboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -60,6 +61,7 @@ exports.AppModule = AppModule = __decorate([
                 },
             }),
             practice_test_module_1.PracticeTestModule,
+            leaderboard_module_1.LeaderboardModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

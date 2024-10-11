@@ -3,7 +3,7 @@ import { CreatePracticeTestDto } from './dto/create-practice_test.dto';
 import { Response } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
-import { SaveTestResultDto } from './dto/save-result.dto';
+import { SavePracticeTestResultDto } from './dto/save-result.dto';
 export declare class PracticeTestController {
     private practiceTestService;
     constructor(practiceTestService: PracticeTestService);
@@ -17,7 +17,7 @@ export declare class PracticeTestController {
     getTestById(id: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategory(categoryId: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategoryName(category: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
-    saveTestResult(saveTestResultDto: SaveTestResultDto, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    saveTestResult(saveTestResultDto: SavePracticeTestResultDto, practiceTestId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     getTestResult(practiceTestId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     updateChapterCompleted(practiceTestId: string, chapterId: string, completed: boolean, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllCategory(res: Response): Promise<Response<any, Record<string, any>>>;

@@ -6,14 +6,14 @@ import { AdminDto } from './dto/createAdmin.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    SignUp(userData: CreateUserDto, res: Response): Promise<any>;
+    signUp(userData: CreateUserDto, res: Response): Promise<any>;
     verifyEmail(data: VerifyOtpDto, res: Response): Promise<Response<any, Record<string, any>>>;
-    SignIn(userData: LoginUserDto, res: Response): Promise<Response<any, Record<string, any>>>;
+    signIn(userData: LoginUserDto, res: Response): Promise<Response<any, Record<string, any>>>;
     forgetPassword(data: ForgetPasswordDto, res: Response): Promise<Response<any, Record<string, any>>>;
     verifyOtp(otpData: VerifyOtpDto, res: Response): Promise<Response<any, Record<string, any>>>;
     changePassword(resetData: ResetPasswordDto, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     refreshToken(req: any, res: Response): Promise<Response<any, Record<string, any>>>;
-    googeleTokenExchange(googleTokenExchangeDto: GoogleTokenExchangeDto, res: Response): Promise<Response<any, Record<string, any>> | undefined>;
-    signUp(userData: CreateUserDto, res: Response): Promise<Response<any, Record<string, any>>>;
-    signIn(userData: AdminDto, res: Response): Promise<Response<any, Record<string, any>>>;
+    googleTokenExchange(googleTokenExchangeDto: GoogleTokenExchangeDto, res: Response): Promise<Response<any, Record<string, any>> | undefined>;
+    adminSignUp(userData: CreateUserDto, res: Response): Promise<Response<any, Record<string, any>>>;
+    adminSignIn(userData: AdminDto, res: Response): Promise<Response<any, Record<string, any>>>;
 }

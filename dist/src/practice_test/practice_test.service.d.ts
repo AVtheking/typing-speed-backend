@@ -4,7 +4,7 @@ import { Utils } from 'src/utils/utils';
 import { Response } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
-import { SaveTestResultDto } from './dto/save-result.dto';
+import { SavePracticeTestResultDto } from './dto/save-result.dto';
 export declare class PracticeTestService {
     private prismaService;
     private util;
@@ -16,7 +16,7 @@ export declare class PracticeTestService {
     getLastTwoTests(userId: string, practiceTestId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllTest(res: Response, page: number, limit: number): Promise<Response<any, Record<string, any>>>;
     trackPracticeTestProgress(practiceTestId: string, chapterId: string, completed: boolean, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
-    saveResult(saveTestResultDto: SaveTestResultDto, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    saveResult(saveTestResultDto: SavePracticeTestResultDto, userId: string, practiceTestId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     createCategory(createCategoryDto: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteCategory(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     updateCategory(id: string, data: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;

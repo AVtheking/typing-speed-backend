@@ -27,7 +27,7 @@ import {
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
-import { SaveTestResultDto } from './dto/save-result.dto';
+import { SavePracticeTestResultDto } from './dto/save-result.dto';
 
 @Controller()
 export class PracticeTestController {
@@ -270,23 +270,29 @@ export class PracticeTestController {
 
   @ApiTags('Practice Test')
   @UseGuards(AuthGuard)
-  @Post('practice-test/result')
+  @Post('practice-test/:practiceTestId/result')
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Save practice test result',
     description: 'Save the result of a practice test taken by the user.',
   })
   @ApiBody({
-    type: SaveTestResultDto,
+    type: SavePracticeTestResultDto,
     description: 'Practice test result data',
   })
   async saveTestResult(
-    @Body() saveTestResultDto: SaveTestResultDto,
+    @Body() saveTestResultDto: SavePracticeTestResultDto,
+    @Param('practiceTestId') practiceTestId: string,
     @Req() req: any,
     @Res() res: Response,
   ) {
     const userId = req.user;
-    return this.practiceTestService.saveResult(saveTestResultDto, userId, res);
+    return this.practiceTestService.saveResult(
+      saveTestResultDto,
+      userId,
+      practiceTestId,
+      res,
+    );
   }
 
   @ApiTags('Practice Test')

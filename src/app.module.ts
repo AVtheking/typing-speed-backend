@@ -18,6 +18,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
       },
     }),
     PracticeTestModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [

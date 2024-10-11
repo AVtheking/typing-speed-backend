@@ -171,7 +171,7 @@ let PracticeTestService = class PracticeTestService {
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', response, res);
     }
     async getLastTwoTests(userId, practiceTestId, res) {
-        const lastTwoTests = await this.prismaService.userTestResult.findMany({
+        const lastTwoTests = await this.prismaService.userPracticeTestResult.findMany({
             where: {
                 userId,
                 practiceTestId,
@@ -254,8 +254,8 @@ let PracticeTestService = class PracticeTestService {
             lastPlayedChapterId: chapterId,
         }, res);
     }
-    async saveResult(saveTestResultDto, userId, res) {
-        const { practiceTestId, wpm, accuracy, time, raw, correct, incorrect, extras, missed, keyPressStats, } = saveTestResultDto;
+    async saveResult(saveTestResultDto, userId, practiceTestId, res) {
+        const { wpm, accuracy, time, raw, correct, incorrect, extras, missed, keyPressStats, } = saveTestResultDto;
         const practiceTest = await this.prismaService.practiceTest.findUnique({
             where: {
                 id: practiceTestId,
@@ -264,14 +264,14 @@ let PracticeTestService = class PracticeTestService {
         if (!practiceTest) {
             throw new common_1.NotFoundException('Practice Test not found');
         }
-        const previousAttemptCount = await this.prismaService.userTestResult.count({
+        const previousAttemptCount = await this.prismaService.userPracticeTestResult.count({
             where: {
                 userId,
                 practiceTestId,
             },
         });
         const currentAttempt = previousAttemptCount + 1;
-        const result = await this.prismaService.userTestResult.create({
+        const result = await this.prismaService.userPracticeTestResult.create({
             data: {
                 userId,
                 practiceTestId,
@@ -288,7 +288,7 @@ let PracticeTestService = class PracticeTestService {
         for (const stat of keyPressStats) {
             await this.prismaService.userKeyPressed.create({
                 data: {
-                    userTestResultId: result.id,
+                    userPracticeTestResultId: result.id,
                     attempt: currentAttempt,
                     key: stat.key,
                     difficultyScore: stat.difficultyScore,

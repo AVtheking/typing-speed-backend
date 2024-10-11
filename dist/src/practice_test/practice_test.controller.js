@@ -60,9 +60,9 @@ let PracticeTestController = class PracticeTestController {
         const userId = req.user;
         return this.practiceTestService.getTestByCategoryName(category, userId, res);
     }
-    async saveTestResult(saveTestResultDto, req, res) {
+    async saveTestResult(saveTestResultDto, practiceTestId, req, res) {
         const userId = req.user;
-        return this.practiceTestService.saveResult(saveTestResultDto, userId, res);
+        return this.practiceTestService.saveResult(saveTestResultDto, userId, practiceTestId, res);
     }
     async getTestResult(practiceTestId, req, res) {
         const userId = req.user;
@@ -307,21 +307,22 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiTags)('Practice Test'),
     (0, common_1.UseGuards)(guards_1.AuthGuard),
-    (0, common_1.Post)('practice-test/result'),
+    (0, common_1.Post)('practice-test/:practiceTestId/result'),
     (0, swagger_1.ApiBearerAuth)('JWT'),
     (0, swagger_1.ApiOperation)({
         summary: 'Save practice test result',
         description: 'Save the result of a practice test taken by the user.',
     }),
     (0, swagger_1.ApiBody)({
-        type: save_result_dto_1.SaveTestResultDto,
+        type: save_result_dto_1.SavePracticeTestResultDto,
         description: 'Practice test result data',
     }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Res)()),
+    __param(1, (0, common_1.Param)('practiceTestId')),
+    __param(2, (0, common_1.Req)()),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [save_result_dto_1.SaveTestResultDto, Object, Object]),
+    __metadata("design:paramtypes", [save_result_dto_1.SavePracticeTestResultDto, String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "saveTestResult", null);
 __decorate([

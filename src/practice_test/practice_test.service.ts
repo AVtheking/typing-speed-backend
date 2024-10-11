@@ -13,7 +13,7 @@ import { Response } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdatePracticeTestDto } from './dto/update-practice_test.dto';
 import { PracticeTestProgress } from '@prisma/client';
-import { SaveTestResultDto } from './dto/save-result.dto';
+import { SavePracticeTestResultDto } from './dto/save-result.dto';
 
 @Injectable()
 export class PracticeTestService {
@@ -233,19 +233,20 @@ export class PracticeTestService {
   }
 
   async getLastTwoTests(userId: string, practiceTestId: string, res: Response) {
-    const lastTwoTests = await this.prismaService.userTestResult.findMany({
-      where: {
-        userId,
-        practiceTestId,
-      },
-      orderBy: {
-        completedAt: 'desc',
-      },
-      include: {
-        UserKeyPressed: true,
-      },
-      take: 2,
-    });
+    const lastTwoTests =
+      await this.prismaService.userPracticeTestResult.findMany({
+        where: {
+          userId,
+          practiceTestId,
+        },
+        orderBy: {
+          completedAt: 'desc',
+        },
+        include: {
+          UserKeyPressed: true,
+        },
+        take: 2,
+      });
     return this.util.sendHttpResponse(
       true,
       HttpStatus.OK,
@@ -353,12 +354,12 @@ export class PracticeTestService {
   }
 
   async saveResult(
-    saveTestResultDto: SaveTestResultDto,
+    saveTestResultDto: SavePracticeTestResultDto,
     userId: string,
+    practiceTestId: string,
     res: Response,
   ) {
     const {
-      practiceTestId,
       wpm,
       accuracy,
       time,
@@ -408,7 +409,7 @@ export class PracticeTestService {
     for (const stat of keyPressStats) {
       await this.prismaService.userKeyPressed.create({
         data: {
-          userTestResultId: result.id,
+          userPracticeTestResultId: result.id,
           attempt: currentAttempt,
           key: stat.key,
           difficultyScore: stat.difficultyScore,

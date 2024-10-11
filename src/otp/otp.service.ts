@@ -14,7 +14,7 @@ export class OtpService {
     });
   }
   async deleteOtp(email: string) {
-    this.prisma.otp.delete({
+    return this.prisma.otp.delete({
       where: {
         email,
       },

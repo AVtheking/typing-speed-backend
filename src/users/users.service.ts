@@ -3,6 +3,7 @@ import {
   ConflictException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,30 +11,54 @@ import { User } from '@prisma/client';
 
 import { plainToInstance } from 'class-transformer';
 import { Response } from 'express';
-import { LoginUserDto, CreateUserDto, UserDto } from '../auth/dto';
+import {
+  LoginUserDto,
+  CreateUserDto,
+  UserDto,
+  VerifyOtpDto,
+} from '../auth/dto';
 
 // import { UserDto } from '../auth/dto/response-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Utils } from '../utils/utils';
+import { SaveTestResultDto } from './dto/save-test-result.dto';
+import { OtpService } from 'src/otp/otp.service';
+
+import { Mailer } from 'src/utils/Mailer';
 
 @Injectable()
 export class UsersService {
   constructor(
     private prisma: PrismaService,
+    private otpService: OtpService,
     private utils: Utils,
+    private mailer: Mailer,
   ) {}
 
   //return the user which matches the id
-  async getUserById(id: string, res: Response): Promise<Response> {
+  async getUserById(
+    id: string,
+    res: Response | null,
+  ): Promise<Response | User> {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
+      include: {
+        UserTestResult: true,
+      },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const userData = plainToInstance(UserDto, {
       ...user,
     });
 
+    if (!res) {
+      return user;
+    }
     return this.utils.sendHttpResponse(
       true,
       HttpStatus.OK,
@@ -197,13 +222,132 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('User with this email already registered');
     }
-    const updatedUser = await this.updateUserEmail(id, email);
+    const otp = await this.otpService.generateOtp(email);
+
+    if (!otp) {
+      throw new InternalServerErrorException('Error generating OTP');
+    }
+    this.mailer.sendEmailVerificationMail(email, otp);
+
     return this.utils.sendHttpResponse(
       true,
       HttpStatus.OK,
-      'Email updated successfully',
+      'Otp sent to email',
+      {},
+      res,
+    );
+  }
+
+  async verifyEmail(data: VerifyOtpDto, userId: string, res: Response) {
+    const { email, otp } = data;
+    const OTP = await this.otpService.getOtp(email);
+    if (!OTP) {
+      throw new NotFoundException('OTP not found');
+    }
+
+    if (!this.otpService.checkExpiration(OTP)) {
+      await this.otpService.deleteOtp(email);
+
+      throw new BadRequestException('OTP expired');
+    }
+    if (OTP.otp != otp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    //deleting the otp after being used
+    await this.otpService.deleteOtp(email);
+
+    const updatedUser = await this.updateUserEmail(userId, email);
+    return this.utils.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Email verified successfully',
       {
-        email: updatedUser.email,
+        user: updatedUser,
+      },
+      res,
+    );
+  }
+
+  async saveTestResult(
+    userId: string,
+    saveTestResultDto: SaveTestResultDto,
+    res: Response,
+  ) {
+    const user = await this.getUserById(userId, null);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const { wpm, accuracy, time, raw, correct, incorrect, extras, missed } =
+      saveTestResultDto;
+
+    await this.prisma.userTestResult.create({
+      data: {
+        wpm,
+        accuracy,
+        time,
+        raw,
+        correct,
+        incorrect,
+        extras,
+        missed,
+        userId,
+      },
+    });
+
+    // add logic for rank calculation in leaderboard here
+
+    return this.utils.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Test result saved successfully',
+      {
+        wpm,
+        accuracy,
+        time,
+        raw,
+        correct,
+        incorrect,
+        extras,
+        missed,
+      },
+      res,
+    );
+  }
+
+  async uploadProfileImage(file, userId: string, res: Response) {
+    const response = await this.utils.uploadFile(file);
+    const user = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profileImage: response?.Location ?? '',
+      },
+    });
+
+    return this.utils.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Profile image uploaded successfully',
+      {
+        ...user,
+      },
+      res,
+    );
+  }
+
+  async changePassword(userId: string, newPassword: string, res: Response) {
+    const updatedUser = await this.updateUserPassword(userId, newPassword);
+
+    return this.utils.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Password changed successfully',
+      {
+        user: updatedUser,
       },
       res,
     );

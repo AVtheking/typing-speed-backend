@@ -47,6 +47,7 @@ model User {
   email                  String                   @unique
   username               String                   @unique
   password               String
+  profileImage           String?
   verified               Boolean                  @default(false)
   matchPlayed            Int                      @default(0)
   matchWon               Int                      @default(0)
@@ -63,6 +64,7 @@ model User {
   PracticeTestProgress   PracticeTestProgress[]
   UserTestResult         UserTestResult[]
   UserPracticeTestResult UserPracticeTestResult[]
+  LeaderBoard            LeaderBoard[]
 
   @@index([email, username, id])
   @@map("users")
@@ -221,22 +223,54 @@ model UserKeyPressed {
   difficultyScore          Int
   key                      String
   userPracticeTestResult   UserPracticeTestResult @relation(fields: [userPracticeTestResultId], references: [id])
-  UserTestResult           UserTestResult?        @relation(fields: [userTestResultId], references: [id])
-  userTestResultId         String?
 }
 
 model UserTestResult {
-  id             String           @id @default(cuid())
-  userId         String
-  wpm            Int
-  accuracy       Int
-  time           Int
-  raw            Int
-  correct        Int
-  incorrect      Int
-  extras         Int
-  missed         Int
-  completedAt    DateTime         @default(now())
-  user           User             @relation(fields: [userId], references: [id])
-  UserKeyPressed UserKeyPressed[]
+  id          String   @id @default(cuid())
+  userId      String
+  wpm         Int
+  accuracy    Int
+  time        Int
+  raw         Int
+  correct     Int
+  incorrect   Int
+  extras      Int
+  missed      Int
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardDaily {
+  id       String   @id @default(cuid())
+  userId   String
+  score    Int
+  wpm      Int
+  raw      Int
+  accuracy Int
+  date     DateTime
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardWeekly {
+  id        String   @id @default(cuid())
+  userId    String
+  score     Int
+  wpm       Int
+  raw       Int
+  accuracy  Int
+  startDate DateTime
+  endDate   DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model LeaderBoardMonthly {
+  id        String @id @default(cuid())
+  userId    String
+  score     Int
+  wpm       Int
+  raw       Int
+  accuracy  Int
+  startDate Int
+  endDate   Int
+  user      User   @relation(fields: [userId], references: [id])
 }

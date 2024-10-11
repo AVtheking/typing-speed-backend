@@ -14,6 +14,8 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const app_service_1 = require("../app.service");
 const utils_1 = require("../utils/utils");
 const jwt_1 = require("@nestjs/jwt");
+const otp_service_1 = require("../otp/otp.service");
+const Mailer_1 = require("../utils/Mailer");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -21,7 +23,14 @@ exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
         imports: [jwt_1.JwtModule.register({})],
         controllers: [users_controller_1.UserController],
-        providers: [users_service_1.UsersService, prisma_service_1.PrismaService, app_service_1.AppService, utils_1.Utils],
+        providers: [
+            users_service_1.UsersService,
+            prisma_service_1.PrismaService,
+            app_service_1.AppService,
+            utils_1.Utils,
+            otp_service_1.OtpService,
+            Mailer_1.Mailer,
+        ],
         exports: [users_service_1.UsersService],
     })
 ], UsersModule);
