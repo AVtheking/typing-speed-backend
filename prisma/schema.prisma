@@ -64,7 +64,6 @@ model User {
   PracticeTestProgress   PracticeTestProgress[]
   UserTestResult         UserTestResult[]
   UserPracticeTestResult UserPracticeTestResult[]
-  LeaderBoard            LeaderBoard[]
 
   @@index([email, username, id])
   @@map("users")
