@@ -21,7 +21,7 @@ export class LeaderboardService {
     private utils: Utils,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async updateLeaderboardFromRedis() {
     const modes: DtoMode[] = [
       DtoMode.FifteenSeconds,
