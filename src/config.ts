@@ -18,6 +18,9 @@ const getConfig = () => {
   const AWS_REGION = process.env.AWS_REGION;
   const AWS_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 
+  const REDIS_HOST = process.env.REDIS_HOST;
+  const REDIS_PORT = process.env.REDIS_PORT;
+
   return {
     jwtAccessSecret,
     jwtRefreshSecret,
@@ -30,6 +33,8 @@ const getConfig = () => {
     AWS_SECRET_KEY,
     AWS_REGION,
     AWS_BUCKET_NAME,
+    REDIS_HOST,
+    REDIS_PORT,
   };
 };
 

@@ -21,6 +21,12 @@ enum Languages {
   // Add more languages here
 }
 
+enum Mode {
+  FifteenSeconds @map("15s")
+  ThirtySeconds  @map("30s")
+  SixtySeconds   @map("60s")
+}
+
 enum TimeZones {
   IST
   EST
@@ -40,6 +46,21 @@ enum Difficulty {
 enum Layout {
   BoxLayout
   LineLayout
+}
+
+enum Months {
+  January
+  February
+  March
+  April
+  May
+  June
+  July
+  August
+  September
+  October
+  November
+  December
 }
 
 model User {
@@ -232,7 +253,7 @@ model UserTestResult {
   userId      String
   wpm         Int
   accuracy    Int
-  time        Int
+  mode        Mode
   raw         Int
   correct     Int
   incorrect   Int
@@ -245,34 +266,43 @@ model UserTestResult {
 model LeaderBoardDaily {
   id       String   @id @default(cuid())
   userId   String
-  score    Int
+  score    BigInt
   wpm      Int
   raw      Int
   accuracy Int
+  mode     Mode
   date     DateTime
   user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, mode, date])
 }
 
 model LeaderBoardWeekly {
   id        String   @id @default(cuid())
   userId    String
-  score     Int
+  score     BigInt
   wpm       Int
   raw       Int
   accuracy  Int
+  mode      Mode
   startDate DateTime
   endDate   DateTime
   user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, mode, startDate, endDate])
 }
 
 model LeaderBoardMonthly {
-  id        String @id @default(cuid())
-  userId    String
-  score     Int
-  wpm       Int
-  raw       Int
-  accuracy  Int
-  startDate Int
-  endDate   Int
-  user      User   @relation(fields: [userId], references: [id])
+  id       String @id @default(cuid())
+  userId   String
+  score    BigInt
+  wpm      Int
+  raw      Int
+  accuracy Int
+  mode     Mode
+  month    Months
+  year     Int
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, mode, month, year])
 }

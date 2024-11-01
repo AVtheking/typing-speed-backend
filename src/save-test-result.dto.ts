@@ -11,21 +11,14 @@ export class SaveResultDto {
 
   @ApiProperty({
     description: 'Typing accuracy in percentage',
-    example: 99,
+    example: 0.99,
   })
   @IsNumber()
   accuracy: number;
 
   @ApiProperty({
-    description: 'Time taken for the test in seconds',
-    example: 15,
-  })
-  @IsNumber()
-  time: number;
-
-  @ApiProperty({
     description: 'Raw typing speed',
-    example: 15,
+    example: 60,
   })
   @IsNumber()
   raw: number;

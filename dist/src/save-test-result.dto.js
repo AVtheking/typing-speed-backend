@@ -26,23 +26,15 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Typing accuracy in percentage',
-        example: 99,
+        example: 0.99,
     }),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], SaveResultDto.prototype, "accuracy", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Time taken for the test in seconds',
-        example: 15,
-    }),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], SaveResultDto.prototype, "time", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
         description: 'Raw typing speed',
-        example: 15,
+        example: 60,
     }),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)

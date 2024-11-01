@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
@@ -17,8 +20,11 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const utils_1 = require("../utils/utils");
 const otp_service_1 = require("../otp/otp.service");
 const Mailer_1 = require("../utils/Mailer");
+const redis_module_1 = require("../redis/redis.module");
+const ioredis_1 = require("ioredis");
 let UsersService = class UsersService {
-    constructor(prisma, otpService, utils, mailer) {
+    constructor(redisClient, prisma, otpService, utils, mailer) {
+        this.redisClient = redisClient;
         this.prisma = prisma;
         this.otpService = otpService;
         this.utils = utils;
@@ -198,12 +204,63 @@ let UsersService = class UsersService {
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        const { wpm, accuracy, time, raw, correct, incorrect, extras, missed } = saveTestResultDto;
-        await this.prisma.userTestResult.create({
+        const { wpm, accuracy, mode, raw, correct, incorrect, extras, missed } = saveTestResultDto;
+        const timestamp = Date.now();
+        if (!['15s', '30s', '60s'].includes(mode)) {
+            throw new common_1.BadRequestException('Invalid mode. Allowed values are "15s", "30s", or "60s".');
+        }
+        const dailyScore = this.utils.calculateScore(wpm, accuracy, timestamp, utils_1.ScoreScope.DAY);
+        const weeklyScore = this.utils.calculateScore(wpm, accuracy, timestamp, utils_1.ScoreScope.WEEK);
+        const monthlyScore = this.utils.calculateScore(wpm, accuracy, timestamp, utils_1.ScoreScope.MONTH);
+        const dayKey = `leaderboard:daily:${mode}:${new Date().toISOString().split('T')[0]}`;
+        const weekKey = `leaderboard:weekly:${mode}:${this.utils.getWeekKey(new Date())}`;
+        const monthKey = `leaderboard:monthly:${mode}:${new Date().getFullYear()}-${new Date().getMonth() + 1}`;
+        await Promise.all([
+            this.redisClient.zadd(dayKey, dailyScore, userId),
+            this.redisClient.zadd(weekKey, weeklyScore, userId),
+            this.redisClient.zadd(monthKey, monthlyScore, userId),
+        ]);
+        console.log('dayKey', dayKey);
+        await Promise.all([
+            this.redisClient.hset(`${dayKey}:${userId}`, {
+                wpm: wpm.toString(),
+                raw: raw.toString(),
+                accuracy: accuracy.toString(),
+                correct: correct.toString(),
+                incorrect: incorrect.toString(),
+                extras: extras.toString(),
+                missed: missed.toString(),
+            }),
+            this.redisClient.hset(`${weekKey}:${userId}`, {
+                wpm: wpm.toString(),
+                raw: raw.toString(),
+                accuracy: accuracy.toString(),
+                correct: correct.toString(),
+                incorrect: incorrect.toString(),
+                extras: extras.toString(),
+                missed: missed.toString(),
+            }),
+            this.redisClient.hset(`${monthKey}:${userId}`, {
+                wpm: wpm.toString(),
+                raw: raw.toString(),
+                accuracy: accuracy.toString(),
+                correct: correct.toString(),
+                incorrect: incorrect.toString(),
+                extras: extras.toString(),
+                missed: missed.toString(),
+            }),
+        ]);
+        const dailyRank = await this.redisClient.zrevrank(dayKey, userId);
+        const weeklyRank = await this.redisClient.zrevrank(weekKey, userId);
+        const monthlyRank = await this.redisClient.zrevrank(monthKey, userId);
+        const adjustedDailyRank = dailyRank !== null ? dailyRank + 1 : null;
+        const adjustedWeeklyRank = weeklyRank !== null ? weeklyRank + 1 : null;
+        const adjustedMonthlyRank = monthlyRank !== null ? monthlyRank + 1 : null;
+        const result = await this.prisma.userTestResult.create({
             data: {
                 wpm,
                 accuracy,
-                time,
+                mode: this.utils.mapDtoModeToPrismaMode(mode),
                 raw,
                 correct,
                 incorrect,
@@ -213,14 +270,10 @@ let UsersService = class UsersService {
             },
         });
         return this.utils.sendHttpResponse(true, common_1.HttpStatus.OK, 'Test result saved successfully', {
-            wpm,
-            accuracy,
-            time,
-            raw,
-            correct,
-            incorrect,
-            extras,
-            missed,
+            result,
+            dailyRank: adjustedDailyRank,
+            weeklyRank: adjustedWeeklyRank,
+            monthlyRank: adjustedMonthlyRank,
         }, res);
     }
     async uploadProfileImage(file, userId, res) {
@@ -247,7 +300,9 @@ let UsersService = class UsersService {
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+    __param(0, (0, common_1.Inject)(redis_module_1.REDIS_CLIENT_TOKEN)),
+    __metadata("design:paramtypes", [ioredis_1.default,
+        prisma_service_1.PrismaService,
         otp_service_1.OtpService,
         utils_1.Utils,
         Mailer_1.Mailer])

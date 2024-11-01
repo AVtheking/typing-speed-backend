@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -20,15 +21,19 @@ import {
 
 // import { UserDto } from '../auth/dto/response-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { Utils } from '../utils/utils';
+import { ScoreScope, Utils } from '../utils/utils';
 import { SaveTestResultDto } from './dto/save-test-result.dto';
 import { OtpService } from 'src/otp/otp.service';
 
 import { Mailer } from 'src/utils/Mailer';
+import { REDIS_CLIENT_TOKEN } from 'src/redis/redis.module';
+import Redis from 'ioredis';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(REDIS_CLIENT_TOKEN)
+    private readonly redisClient: Redis,
     private prisma: PrismaService,
     private otpService: OtpService,
     private utils: Utils,
@@ -280,14 +285,93 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const { wpm, accuracy, time, raw, correct, incorrect, extras, missed } =
+    const { wpm, accuracy, mode, raw, correct, incorrect, extras, missed } =
       saveTestResultDto;
+    const timestamp = Date.now();
 
-    await this.prisma.userTestResult.create({
+    if (!['15s', '30s', '60s'].includes(mode)) {
+      throw new BadRequestException(
+        'Invalid mode. Allowed values are "15s", "30s", or "60s".',
+      );
+    }
+
+    const dailyScore = this.utils.calculateScore(
+      wpm,
+      accuracy,
+      timestamp,
+      ScoreScope.DAY,
+    );
+    const weeklyScore = this.utils.calculateScore(
+      wpm,
+      accuracy,
+      timestamp,
+      ScoreScope.WEEK,
+    );
+    const monthlyScore = this.utils.calculateScore(
+      wpm,
+      accuracy,
+      timestamp,
+      ScoreScope.MONTH,
+    );
+
+    const dayKey = `leaderboard:daily:${mode}:${new Date().toISOString().split('T')[0]}`;
+    const weekKey = `leaderboard:weekly:${mode}:${this.utils.getWeekKey(new Date())}`;
+    const monthKey = `leaderboard:monthly:${mode}:${new Date().getFullYear()}-${new Date().getMonth() + 1}`;
+
+    // Save each score to its respective Redis sorted set
+    await Promise.all([
+      this.redisClient.zadd(dayKey, dailyScore, userId),
+      this.redisClient.zadd(weekKey, weeklyScore, userId),
+      this.redisClient.zadd(monthKey, monthlyScore, userId),
+    ]);
+
+    console.log('dayKey', dayKey);
+
+    // Save additional details in Redis hashes
+    await Promise.all([
+      this.redisClient.hset(`${dayKey}:${userId}`, {
+        wpm: wpm.toString(),
+        raw: raw.toString(),
+        accuracy: accuracy.toString(),
+        correct: correct.toString(),
+        incorrect: incorrect.toString(),
+        extras: extras.toString(),
+        missed: missed.toString(),
+      }),
+      this.redisClient.hset(`${weekKey}:${userId}`, {
+        wpm: wpm.toString(),
+        raw: raw.toString(),
+        accuracy: accuracy.toString(),
+        correct: correct.toString(),
+        incorrect: incorrect.toString(),
+        extras: extras.toString(),
+        missed: missed.toString(),
+      }),
+      this.redisClient.hset(`${monthKey}:${userId}`, {
+        wpm: wpm.toString(),
+        raw: raw.toString(),
+        accuracy: accuracy.toString(),
+        correct: correct.toString(),
+        incorrect: incorrect.toString(),
+        extras: extras.toString(),
+        missed: missed.toString(),
+      }),
+    ]);
+
+    // Retrieve ranks for each leaderboard
+    const dailyRank = await this.redisClient.zrevrank(dayKey, userId);
+    const weeklyRank = await this.redisClient.zrevrank(weekKey, userId);
+    const monthlyRank = await this.redisClient.zrevrank(monthKey, userId);
+
+    const adjustedDailyRank = dailyRank !== null ? dailyRank + 1 : null;
+    const adjustedWeeklyRank = weeklyRank !== null ? weeklyRank + 1 : null;
+    const adjustedMonthlyRank = monthlyRank !== null ? monthlyRank + 1 : null;
+
+    const result = await this.prisma.userTestResult.create({
       data: {
         wpm,
         accuracy,
-        time,
+        mode: this.utils.mapDtoModeToPrismaMode(mode),
         raw,
         correct,
         incorrect,
@@ -304,14 +388,10 @@ export class UsersService {
       HttpStatus.OK,
       'Test result saved successfully',
       {
-        wpm,
-        accuracy,
-        time,
-        raw,
-        correct,
-        incorrect,
-        extras,
-        missed,
+        result,
+        dailyRank: adjustedDailyRank,
+        weeklyRank: adjustedWeeklyRank,
+        monthlyRank: adjustedMonthlyRank,
       },
       res,
     );

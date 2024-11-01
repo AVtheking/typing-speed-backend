@@ -6,12 +6,14 @@ import { Utils } from '../utils/utils';
 import { SaveTestResultDto } from './dto/save-test-result.dto';
 import { OtpService } from 'src/otp/otp.service';
 import { Mailer } from 'src/utils/Mailer';
+import Redis from 'ioredis';
 export declare class UsersService {
+    private readonly redisClient;
     private prisma;
     private otpService;
     private utils;
     private mailer;
-    constructor(prisma: PrismaService, otpService: OtpService, utils: Utils, mailer: Mailer);
+    constructor(redisClient: Redis, prisma: PrismaService, otpService: OtpService, utils: Utils, mailer: Mailer);
     getUserById(id: string, res: Response | null): Promise<Response | User>;
     createUser(data: CreateUserDto): Promise<User | Response>;
     updateUser(id: string, data: any): Promise<User>;

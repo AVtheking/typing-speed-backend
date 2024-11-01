@@ -26,12 +26,15 @@ const path_1 = require("path");
 const throttler_1 = require("@nestjs/throttler");
 const devtools_integration_1 = require("@nestjs/devtools-integration");
 const leaderboard_module_1 = require("./leaderboard/leaderboard.module");
+const redis_module_1 = require("./redis/redis.module");
+const schedule_1 = require("@nestjs/schedule");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            schedule_1.ScheduleModule.forRoot(),
             throttler_1.ThrottlerModule.forRoot([
                 {
                     ttl: 60000,
@@ -62,6 +65,10 @@ exports.AppModule = AppModule = __decorate([
             }),
             practice_test_module_1.PracticeTestModule,
             leaderboard_module_1.LeaderboardModule,
+            redis_module_1.RedisModule.forRoot({
+                host: config_2.Env.REDIS_HOST,
+                port: config_2.Env.REDIS_PORT,
+            }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [

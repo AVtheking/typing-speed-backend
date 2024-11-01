@@ -1,8 +1,15 @@
-import { IsArray, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { SaveResultDto } from 'src/save-test-result.dto';
 
 export class SavePracticeTestResultDto extends SaveResultDto {
+  @ApiProperty({
+    description: 'Time taken for the test in seconds',
+    example: 15,
+  })
+  @IsNumber()
+  time: number;
+
   @ApiProperty({
     description: 'List of key press stats with difficulty scores',
     type: Array,

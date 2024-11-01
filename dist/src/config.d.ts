@@ -10,4 +10,6 @@ export declare const Env: {
     AWS_SECRET_KEY: string | undefined;
     AWS_REGION: string | undefined;
     AWS_BUCKET_NAME: string | undefined;
+    REDIS_HOST: string | undefined;
+    REDIS_PORT: string | undefined;
 };
