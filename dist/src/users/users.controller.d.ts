@@ -24,6 +24,9 @@ export declare class UserController {
         lastTakenTestId: string | null;
     }>;
     changeEmail(req: any, res: Response, body: ChangeEmailDto): Promise<Response<any, Record<string, any>>>;
+    changePassword(req: any, res: Response, body: {
+        password: string;
+    }): Promise<Response<any, Record<string, any>>>;
     verifyEmail(req: any, res: Response, body: VerifyOtpDto): Promise<Response<any, Record<string, any>>>;
     saveTest(req: any, res: Response, body: SaveTestResultDto): Promise<Response<any, Record<string, any>>>;
     updateProfileImage(req: any, res: Response, file: Express.Multer.File): Promise<Response<any, Record<string, any>> | undefined>;

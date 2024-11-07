@@ -21,14 +21,14 @@ export class LeaderboardService {
     private utils: Utils,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async updateLeaderboardFromRedis() {
     const modes: DtoMode[] = [
       DtoMode.FifteenSeconds,
       DtoMode.ThirtySeconds,
       DtoMode.SixtySeconds,
     ];
-    console.log('\x1b[32m', 'Updating leaderboard from Redis \x1b[0m');
+
     const leaderboardTypes = ['daily', 'weekly', 'monthly'];
     try {
       for (const mode of modes) {
@@ -57,6 +57,7 @@ export class LeaderboardService {
 
             for (let i = 0; i < leaderboardEntries.length; i += 2) {
               const userId = leaderboardEntries[i];
+              console.log(userId);
               const score = parseInt(leaderboardEntries[i + 1]);
               const userHashKey = `${key}:${userId}`;
 

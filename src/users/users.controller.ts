@@ -44,7 +44,7 @@ export class UserController {
     return this.userService.getUserById(userId, res);
   }
 
-  @Post('/change-email')
+  @Patch('/change-email')
   @ApiOperation({
     summary: 'Change user email',
     description: 'Allows a user to change their email address.',
@@ -60,8 +60,23 @@ export class UserController {
     return this.userService.changeEmail(userId, email, res);
   }
 
+  @Patch('/change-password')
+  @ApiOperation({
+    summary: 'Change user password',
+    description: 'Allows a user to change their password.',
+  })
+  async changePassword(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() body: { password: string },
+  ) {
+    const userId = req.user;
+    const { password } = body;
+    return this.userService.changePassword(userId, password, res);
+  }
+
   @UseGuards(AuthGuard)
-  @Patch('/verify-email')
+  @Post('/verify-email')
   @ApiOperation({
     summary: 'Verify email address',
     description:
