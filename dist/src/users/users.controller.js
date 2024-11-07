@@ -34,6 +34,11 @@ let UserController = class UserController {
         const { email } = body;
         return this.userService.changeEmail(userId, email, res);
     }
+    async changePassword(req, res, body) {
+        const userId = req.user;
+        const { password } = body;
+        return this.userService.changePassword(userId, password, res);
+    }
     async verifyEmail(req, res, body) {
         const userId = req.user;
         return this.userService.verifyEmail(body, userId, res);
@@ -63,7 +68,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUser", null);
 __decorate([
-    (0, common_1.Post)('/change-email'),
+    (0, common_1.Patch)('/change-email'),
     (0, swagger_1.ApiOperation)({
         summary: 'Change user email',
         description: 'Allows a user to change their email address.',
@@ -77,8 +82,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "changeEmail", null);
 __decorate([
+    (0, common_1.Patch)('/change-password'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Change user password',
+        description: 'Allows a user to change their password.',
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "changePassword", null);
+__decorate([
     (0, common_1.UseGuards)(guards_1.AuthGuard),
-    (0, common_1.Patch)('/verify-email'),
+    (0, common_1.Post)('/verify-email'),
     (0, swagger_1.ApiOperation)({
         summary: 'Verify email address',
         description: 'Verifies the OTP for email and updates the email verification status.',

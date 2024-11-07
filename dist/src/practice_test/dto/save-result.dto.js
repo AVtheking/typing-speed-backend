@@ -18,6 +18,14 @@ class SavePracticeTestResultDto extends save_test_result_dto_1.SaveResultDto {
 exports.SavePracticeTestResultDto = SavePracticeTestResultDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
+        description: 'Time taken for the test in seconds',
+        example: 15,
+    }),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SavePracticeTestResultDto.prototype, "time", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
         description: 'List of key press stats with difficulty scores',
         type: Array,
         example: [

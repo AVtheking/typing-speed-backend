@@ -10,13 +10,17 @@ exports.LeaderboardModule = void 0;
 const common_1 = require("@nestjs/common");
 const leaderboard_service_1 = require("./leaderboard.service");
 const leaderboard_controller_1 = require("./leaderboard.controller");
+const prisma_service_1 = require("../prisma/prisma.service");
+const utils_1 = require("../utils/utils");
+const jwt_1 = require("@nestjs/jwt");
 let LeaderboardModule = class LeaderboardModule {
 };
 exports.LeaderboardModule = LeaderboardModule;
 exports.LeaderboardModule = LeaderboardModule = __decorate([
     (0, common_1.Module)({
+        imports: [jwt_1.JwtModule.register({})],
         controllers: [leaderboard_controller_1.LeaderboardController],
-        providers: [leaderboard_service_1.LeaderboardService],
+        providers: [leaderboard_service_1.LeaderboardService, prisma_service_1.PrismaService, utils_1.Utils],
     })
 ], LeaderboardModule);
 //# sourceMappingURL=leaderboard.module.js.map

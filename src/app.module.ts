@@ -19,9 +19,12 @@ import { join } from 'path';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { RedisModule } from './redis/redis.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -54,6 +57,10 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     }),
     PracticeTestModule,
     LeaderboardModule,
+    RedisModule.forRoot({
+      host: Env.REDIS_HOST,
+      port: Env.REDIS_PORT as number | undefined,
+    }),
   ],
   controllers: [AppController],
   providers: [
