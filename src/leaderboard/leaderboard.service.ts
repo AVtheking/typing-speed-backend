@@ -57,7 +57,7 @@ export class LeaderboardService {
 
             for (let i = 0; i < leaderboardEntries.length; i += 2) {
               const userId = leaderboardEntries[i];
-              console.log(userId);
+
               const score = parseInt(leaderboardEntries[i + 1]);
               const userHashKey = `${key}:${userId}`;
 

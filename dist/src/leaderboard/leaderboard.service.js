@@ -48,7 +48,6 @@ let LeaderboardService = class LeaderboardService {
                         const leaderboardEntries = await this.redisClient.zrevrange(key, 0, -1, 'WITHSCORES');
                         for (let i = 0; i < leaderboardEntries.length; i += 2) {
                             const userId = leaderboardEntries[i];
-                            console.log(userId);
                             const score = parseInt(leaderboardEntries[i + 1]);
                             const userHashKey = `${key}:${userId}`;
                             const wpm = parseInt((await this.redisClient.hget(userHashKey, 'wpm')) || '0');
@@ -375,7 +374,7 @@ let LeaderboardService = class LeaderboardService {
 };
 exports.LeaderboardService = LeaderboardService;
 __decorate([
-    (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_10_SECONDS),
+    (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_10_MINUTES),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
