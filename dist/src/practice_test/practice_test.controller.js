@@ -60,13 +60,13 @@ let PracticeTestController = class PracticeTestController {
         const userId = req.user;
         return this.practiceTestService.getTestByCategoryName(category, userId, res);
     }
-    async saveTestResult(saveTestResultDto, practiceTestId, req, res) {
+    async saveTestResult(saveTestResultDto, practiceTestId, chapterId, req, res) {
         const userId = req.user;
-        return this.practiceTestService.saveResult(saveTestResultDto, userId, practiceTestId, res);
+        return this.practiceTestService.saveResult(saveTestResultDto, userId, practiceTestId, chapterId, res);
     }
-    async getTestResult(practiceTestId, req, res) {
+    async getTestResult(practiceTestId, chapterId, req, res) {
         const userId = req.user;
-        return this.practiceTestService.getLastTwoTests(practiceTestId, userId, res);
+        return this.practiceTestService.getLastTwoTests(userId, practiceTestId, chapterId, res);
     }
     async updateChapterCompleted(practiceTestId, chapterId, completed, req, res) {
         const userId = req.user;
@@ -319,10 +319,11 @@ __decorate([
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('practiceTestId')),
-    __param(2, (0, common_1.Req)()),
-    __param(3, (0, common_1.Res)()),
+    __param(2, (0, common_1.Query)('chapterId')),
+    __param(3, (0, common_1.Req)()),
+    __param(4, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [save_result_dto_1.SavePracticeTestResultDto, String, Object, Object]),
+    __metadata("design:paramtypes", [save_result_dto_1.SavePracticeTestResultDto, String, String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "saveTestResult", null);
 __decorate([
@@ -338,10 +339,11 @@ __decorate([
         description: 'Fetch last 2 attempts of a practice test',
     }),
     __param(0, (0, common_1.Query)('practiceTestId')),
-    __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Res)()),
+    __param(1, (0, common_1.Query)('chapterId')),
+    __param(2, (0, common_1.Req)()),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:paramtypes", [String, String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PracticeTestController.prototype, "getTestResult", null);
 __decorate([

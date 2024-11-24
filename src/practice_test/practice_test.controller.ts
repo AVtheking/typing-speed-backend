@@ -283,6 +283,7 @@ export class PracticeTestController {
   async saveTestResult(
     @Body() saveTestResultDto: SavePracticeTestResultDto,
     @Param('practiceTestId') practiceTestId: string,
+    @Query('chapterId') chapterId: string,
     @Req() req: any,
     @Res() res: Response,
   ) {
@@ -291,6 +292,7 @@ export class PracticeTestController {
       saveTestResultDto,
       userId,
       practiceTestId,
+      chapterId,
       res,
     );
   }
@@ -308,13 +310,16 @@ export class PracticeTestController {
   })
   async getTestResult(
     @Query('practiceTestId') practiceTestId: string,
+    @Query('chapterId') chapterId: string,
     @Req() req: any,
     @Res() res: Response,
   ) {
     const userId = req.user;
     return this.practiceTestService.getLastTwoTests(
-      practiceTestId,
       userId,
+      practiceTestId,
+      chapterId,
+
       res,
     );
   }

@@ -64,30 +64,30 @@ enum Months {
 }
 
 model User {
-  id                     String                   @id @default(cuid())
-  email                  String                   @unique
-  username               String                   @unique
-  password               String
-  profileImage           String?
-  verified               Boolean                  @default(false)
-  matchPlayed            Int                      @default(0)
-  matchWon               Int                      @default(0)
-  matchLost              Int                      @default(0)
-  avgWpm                 Int                      @default(0)
-  avgAccuracy            Int                      @default(0)
-  rank                   Int?
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  lastTakenTestId        String?
-  lastTakenTest          PracticeTest?            @relation(fields: [lastTakenTestId], references: [id])
-  Test                   Test[]
-  UserProgress           UserProgress[]
-  PracticeTestProgress   PracticeTestProgress[]
-  UserTestResult         UserTestResult[]
-  UserPracticeTestResult UserPracticeTestResult[]
-  LeaderBoardDaily       LeaderBoardDaily[]
-  LeaderBoardWeekly      LeaderBoardWeekly[]
-  LeaderBoardMonthly     LeaderBoardMonthly[]
+  id                            String                          @id @default(cuid())
+  email                         String                          @unique
+  username                      String                          @unique
+  password                      String
+  profileImage                  String?
+  verified                      Boolean                         @default(false)
+  matchPlayed                   Int                             @default(0)
+  matchWon                      Int                             @default(0)
+  matchLost                     Int                             @default(0)
+  avgWpm                        Int                             @default(0)
+  avgAccuracy                   Int                             @default(0)
+  rank                          Int?
+  createdAt                     DateTime                        @default(now())
+  updatedAt                     DateTime                        @updatedAt
+  lastTakenTestId               String?
+  lastTakenTest                 PracticeTest?                   @relation(fields: [lastTakenTestId], references: [id])
+  Test                          Test[]
+  UserProgress                  UserProgress[]
+  PracticeTestProgress          PracticeTestProgress[]
+  UserTestResult                UserTestResult[]
+  userPracticeTestChapterResult UserPracticeTestChapterResult[]
+  LeaderBoardDaily              LeaderBoardDaily[]
+  LeaderBoardWeekly             LeaderBoardWeekly[]
+  LeaderBoardMonthly            LeaderBoardMonthly[]
 
   @@index([email, username, id])
   @@map("users")
@@ -160,38 +160,39 @@ model Category {
 }
 
 model PracticeTest {
-  id                     String                   @id @default(cuid())
-  title                  String                   @unique
-  description            String
-  titleAndDescription    String
-  metaTitle              String
-  metaDescription        String
-  videoTag               String?
-  categoryId             String
-  categoryName           String
-  category               Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  Chapter                Chapter[]
-  PracticeTestProgress   PracticeTestProgress[]
-  User                   User[]
-  UserPracticeTestResult UserPracticeTestResult[]
+  id                            String                          @id @default(cuid())
+  title                         String                          @unique
+  description                   String
+  titleAndDescription           String
+  metaTitle                     String
+  metaDescription               String
+  videoTag                      String?
+  categoryId                    String
+  categoryName                  String
+  category                      Category                        @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt                     DateTime                        @default(now())
+  updatedAt                     DateTime                        @updatedAt
+  Chapter                       Chapter[]
+  PracticeTestProgress          PracticeTestProgress[]
+  User                          User[]
+  userPracticeTestChapterResult UserPracticeTestChapterResult[]
 
   @@index([id])
   @@map("lessons")
 }
 
 model Chapter {
-  id                   String                 @id @default(cuid())
-  title                String
-  embedCode            String
-  layout               Layout
-  practiceTest         PracticeTest           @relation(fields: [practiceTestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  practiceTestId       String
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
-  UserProgress         UserProgress[]
-  PracticeTestProgress PracticeTestProgress[]
+  id                            String                          @id @default(cuid())
+  title                         String
+  embedCode                     String
+  layout                        Layout
+  practiceTest                  PracticeTest                    @relation(fields: [practiceTestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  practiceTestId                String
+  createdAt                     DateTime                        @default(now())
+  updatedAt                     DateTime                        @updatedAt
+  UserProgress                  UserProgress[]
+  PracticeTestProgress          PracticeTestProgress[]
+  userPracticeTestChapterResult UserPracticeTestChapterResult[]
 
   @@index([id])
   @@map("chapters")
@@ -221,10 +222,11 @@ model PracticeTestProgress {
   @@unique([userId, practiceTestId])
 }
 
-model UserPracticeTestResult {
+model UserPracticeTestChapterResult {
   id             String           @id @default(cuid())
   userId         String
   practiceTestId String
+  chapterId      String
   wpm            Int
   accuracy       Int
   time           Int
@@ -236,16 +238,17 @@ model UserPracticeTestResult {
   completedAt    DateTime         @default(now())
   user           User             @relation(fields: [userId], references: [id])
   practiceTest   PracticeTest     @relation(fields: [practiceTestId], references: [id])
+  chapter        Chapter          @relation(fields: [chapterId], references: [id])
   UserKeyPressed UserKeyPressed[]
 }
 
 model UserKeyPressed {
-  id                       String                 @id @default(uuid())
-  userPracticeTestResultId String
-  attempt                  Int
-  difficultyScore          Int
-  key                      String
-  userPracticeTestResult   UserPracticeTestResult @relation(fields: [userPracticeTestResultId], references: [id])
+  id                              String                        @id @default(uuid())
+  userPracticeTestChapterResultId String
+  attempt                         Int
+  difficultyScore                 Int
+  key                             String
+  userPracticeTestChapterResult   UserPracticeTestChapterResult @relation(fields: [userPracticeTestChapterResultId], references: [id])
 }
 
 model UserTestResult {

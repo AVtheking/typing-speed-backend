@@ -232,12 +232,18 @@ export class PracticeTestService {
     );
   }
 
-  async getLastTwoTests(userId: string, practiceTestId: string, res: Response) {
+  async getLastTwoTests(
+    userId: string,
+    practiceTestId: string,
+    chapterId: string,
+    res: Response,
+  ) {
     const lastTwoTests =
-      await this.prismaService.userPracticeTestResult.findMany({
+      await this.prismaService.userPracticeTestChapterResult.findMany({
         where: {
           userId,
           practiceTestId,
+          chapterId,
         },
         orderBy: {
           completedAt: 'desc',
@@ -357,6 +363,7 @@ export class PracticeTestService {
     saveTestResultDto: SavePracticeTestResultDto,
     userId: string,
     practiceTestId: string,
+    chapterId: string,
     res: Response,
   ) {
     const {
@@ -382,7 +389,7 @@ export class PracticeTestService {
     }
 
     const previousAttemptCount =
-      await this.prismaService.userPracticeTestResult.count({
+      await this.prismaService.userPracticeTestChapterResult.count({
         where: {
           userId,
           practiceTestId,
@@ -391,31 +398,41 @@ export class PracticeTestService {
 
     const currentAttempt = previousAttemptCount + 1;
 
-    const result = await this.prismaService.userPracticeTestResult.create({
-      data: {
-        userId,
-        practiceTestId,
-        wpm,
-        accuracy,
-        time,
-        raw,
-        correct,
-        incorrect,
-        extras,
-        missed,
-      },
-    });
+    const result =
+      await this.prismaService.userPracticeTestChapterResult.create({
+        data: {
+          userId,
+          practiceTestId,
+          chapterId,
+          wpm,
+          accuracy,
+          time,
+          raw,
+          correct,
+          incorrect,
+          extras,
+          missed,
+        },
+      });
 
     for (const stat of keyPressStats) {
       await this.prismaService.userKeyPressed.create({
         data: {
-          userPracticeTestResultId: result.id,
+          userPracticeTestChapterResultId: result.id,
           attempt: currentAttempt,
           key: stat.key,
           difficultyScore: stat.difficultyScore,
         },
       });
     }
+
+    this.trackPracticeTestProgress(
+      practiceTestId,
+      chapterId,
+      true,
+      userId,
+      res,
+    );
 
     return this.util.sendHttpResponse(
       true,

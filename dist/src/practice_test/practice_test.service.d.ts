@@ -13,10 +13,10 @@ export declare class PracticeTestService {
     updateTest(id: string, updatePracticeTestDto: UpdatePracticeTestDto, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteTest(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getPracticeTestById(practiceTestId: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
-    getLastTwoTests(userId: string, practiceTestId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    getLastTwoTests(userId: string, practiceTestId: string, chapterId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllTest(res: Response, page: number, limit: number): Promise<Response<any, Record<string, any>>>;
     trackPracticeTestProgress(practiceTestId: string, chapterId: string, completed: boolean, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
-    saveResult(saveTestResultDto: SavePracticeTestResultDto, userId: string, practiceTestId: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    saveResult(saveTestResultDto: SavePracticeTestResultDto, userId: string, practiceTestId: string, chapterId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     createCategory(createCategoryDto: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;
     deleteCategory(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     updateCategory(id: string, data: CreateCategoryDto, res: Response): Promise<Response<any, Record<string, any>>>;

@@ -170,11 +170,12 @@ let PracticeTestService = class PracticeTestService {
         };
         return this.util.sendHttpResponse(true, common_1.HttpStatus.OK, 'Practice Test found', response, res);
     }
-    async getLastTwoTests(userId, practiceTestId, res) {
-        const lastTwoTests = await this.prismaService.userPracticeTestResult.findMany({
+    async getLastTwoTests(userId, practiceTestId, chapterId, res) {
+        const lastTwoTests = await this.prismaService.userPracticeTestChapterResult.findMany({
             where: {
                 userId,
                 practiceTestId,
+                chapterId,
             },
             orderBy: {
                 completedAt: 'desc',
@@ -254,7 +255,7 @@ let PracticeTestService = class PracticeTestService {
             lastPlayedChapterId: chapterId,
         }, res);
     }
-    async saveResult(saveTestResultDto, userId, practiceTestId, res) {
+    async saveResult(saveTestResultDto, userId, practiceTestId, chapterId, res) {
         const { wpm, accuracy, time, raw, correct, incorrect, extras, missed, keyPressStats, } = saveTestResultDto;
         const practiceTest = await this.prismaService.practiceTest.findUnique({
             where: {
@@ -264,17 +265,18 @@ let PracticeTestService = class PracticeTestService {
         if (!practiceTest) {
             throw new common_1.NotFoundException('Practice Test not found');
         }
-        const previousAttemptCount = await this.prismaService.userPracticeTestResult.count({
+        const previousAttemptCount = await this.prismaService.userPracticeTestChapterResult.count({
             where: {
                 userId,
                 practiceTestId,
             },
         });
         const currentAttempt = previousAttemptCount + 1;
-        const result = await this.prismaService.userPracticeTestResult.create({
+        const result = await this.prismaService.userPracticeTestChapterResult.create({
             data: {
                 userId,
                 practiceTestId,
+                chapterId,
                 wpm,
                 accuracy,
                 time,
@@ -288,13 +290,14 @@ let PracticeTestService = class PracticeTestService {
         for (const stat of keyPressStats) {
             await this.prismaService.userKeyPressed.create({
                 data: {
-                    userPracticeTestResultId: result.id,
+                    userPracticeTestChapterResultId: result.id,
                     attempt: currentAttempt,
                     key: stat.key,
                     difficultyScore: stat.difficultyScore,
                 },
             });
         }
+        this.trackPracticeTestProgress(practiceTestId, chapterId, true, userId, res);
         return this.util.sendHttpResponse(true, common_1.HttpStatus.CREATED, 'Result saved', result, res);
     }
     async createCategory(createCategoryDto, res) {

@@ -17,8 +17,8 @@ export declare class PracticeTestController {
     getTestById(id: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategory(categoryId: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
     getTestByCategoryName(category: string, res: Response, req: any): Promise<Response<any, Record<string, any>>>;
-    saveTestResult(saveTestResultDto: SavePracticeTestResultDto, practiceTestId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
-    getTestResult(practiceTestId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    saveTestResult(saveTestResultDto: SavePracticeTestResultDto, practiceTestId: string, chapterId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    getTestResult(practiceTestId: string, chapterId: string, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     updateChapterCompleted(practiceTestId: string, chapterId: string, completed: boolean, req: any, res: Response): Promise<Response<any, Record<string, any>>>;
     getAllCategory(res: Response): Promise<Response<any, Record<string, any>>>;
     getCategoryByName(name: string, res: Response): Promise<Response<any, Record<string, any>>>;
