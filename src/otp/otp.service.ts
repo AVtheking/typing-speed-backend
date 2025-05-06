@@ -7,19 +7,14 @@ export class OtpService {
   constructor(private prisma: PrismaService) {}
 
   async getOtp(email: string): Promise<Otp | null> {
-    const otp = await this.prisma.otp.findUnique({
+    return this.prisma.otp.findUnique({
       where: {
         email,
       },
     });
-
-    if (!otp) {
-      return null;
-    }
-    return otp;
   }
   async deleteOtp(email: string) {
-    await this.prisma.otp.delete({
+    return this.prisma.otp.delete({
       where: {
         email,
       },
@@ -33,7 +28,9 @@ export class OtpService {
 
     const diff = currentTime.getTime() - otpTime.getTime();
 
-    return diff < 60000;
+    //if the difference is less than 1 minute then return true
+    const expirationThreshold = 60000; // 1 minute
+    return diff < expirationThreshold;
   }
 
   async generateOtp(email: string): Promise<number> {
@@ -43,6 +40,7 @@ export class OtpService {
         email,
       },
     });
+
     if (existingOtp) {
       await this.prisma.otp.update({
         where: {

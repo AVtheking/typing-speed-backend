@@ -1,8 +1,11 @@
 # compiled output
-/dist
+
 /node_modules
 /build
 /postgres-data
+/redis-data
+/postgres-data_test
+/prisma/migrations
 
 # Logs
 logs

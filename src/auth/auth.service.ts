@@ -27,7 +27,11 @@ import {
 } from './dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleTokenExchangeDto } from './dto/google-exchange.dto';
-import { Env } from '../../src/config';
+import { Env } from 'src/config';
+
+import { AdminService } from 'src/admin/admin.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
+import { AdminDto } from './dto/createAdmin.dto';
 
 interface googleUser {
   username: string;
@@ -44,6 +48,7 @@ export class AuthService {
     private httpService: HttpService,
     private utlis: Utils,
     private mailer: Mailer,
+    private adminService: AdminService,
   ) {}
 
   /*
@@ -86,6 +91,13 @@ export class AuthService {
       return;
     }
     const otp = await this.otpService.generateOtp(signUp.email);
+
+    if (!otp) {
+      throw new InternalServerErrorException('Error generating OTP');
+    }
+
+    //TODO: Use a queue to send the email
+
     this.mailer.sendEmailVerificationMail(signUp.email, otp);
 
     const responseData = plainToInstance(SignUpResponseDto, {
@@ -118,7 +130,7 @@ export class AuthService {
     }
 
     if (!this.otpService.checkExpiration(OTP)) {
-      this.otpService.deleteOtp(email);
+      await this.otpService.deleteOtp(email);
 
       throw new BadRequestException('OTP expired');
     }
@@ -137,7 +149,7 @@ export class AuthService {
     }
 
     if (user.verified) {
-      throw new BadRequestException('Email already verified');
+      throw new BadRequestException('Email already registered');
     }
 
     //updates the verified field of the user
@@ -226,6 +238,8 @@ export class AuthService {
     }
     //generating the otp and sending it to mail
     const otp = await this.otpService.generateOtp(email);
+
+    //TODO: use a queue to send the email
     this.mailer.sendForgetPasswordMail(email, otp);
 
     return this.utlis.sendHttpResponse(
@@ -257,12 +271,14 @@ export class AuthService {
       throw new BadRequestException('OTP expired');
     }
 
+    //checking if the otp is valid or not
     if (OTP.otp != otp) {
       throw new BadRequestException('Invalid OTP');
     }
 
     //deleting the otp after it is verified
-    await this.otpService.deleteOtp(email);
+    //delete otp asyncronously
+    this.otpService.deleteOtp(email);
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
@@ -270,7 +286,7 @@ export class AuthService {
     }
 
     if (!user.verified) {
-      throw new UnauthorizedException('Email not verified');
+      throw new UnauthorizedException('User with this email does not exist');
     }
 
     //generating the token to reset password
@@ -319,6 +335,9 @@ export class AuthService {
    */
 
   async refreshToken(res: Response, userId: string): Promise<Response> {
+    if (!Env.jwtAccessSecret) {
+      throw new InternalServerErrorException('Access secret not defined');
+    }
     const accessToken = await this.generateToken(
       userId,
       Env.jwtAccessSecret,
@@ -364,7 +383,7 @@ export class AuthService {
         id: data.sub,
       };
 
-      return await this.googleSignIn(user, res);
+      return this.googleSignIn(user, res);
     }
   }
 
@@ -381,7 +400,7 @@ export class AuthService {
     const userExists = await this.usersService.getUserByEmail(user.email);
     const password = this.utlis.randomPassword();
     if (!userExists) {
-      return await this.registerOauthUser(
+      return this.registerOauthUser(
         {
           email: user.email,
           username: user.username,
@@ -455,10 +474,79 @@ export class AuthService {
       accessToken,
       refreshToken,
     });
+
     return this.utlis.sendHttpResponse(
       true,
       HttpStatus.CREATED,
       'User created successfully',
+      responseData,
+      res,
+    );
+  }
+
+  async signUpAdmin(data: AdminDto, res: Response) {
+    const { email, password } = data;
+    const hashPassword = await this.utlis.hashPassword(password);
+    const admin = await this.adminService.createAdmin({
+      email,
+      password: hashPassword,
+    });
+
+    if (!admin) {
+      throw new InternalServerErrorException('Error creating admin');
+    }
+    const response = plainToInstance(SignUpResponseDto, {
+      email: data.email,
+    });
+
+    return this.utlis.sendHttpResponse(
+      true,
+      HttpStatus.CREATED,
+      'Admin created successfully',
+      response,
+      res,
+    );
+  }
+
+  async loginAdmin(data: AdminDto, res: Response) {
+    const { email, password } = data;
+    const admin = await this.adminService.findAdminByEmail(email);
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+    const isPasswordMatch = await this.utlis.comparePassword(
+      password,
+      admin.password,
+    );
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid password');
+    }
+    if (!Env.jwtAdminSecret) {
+      throw new InternalServerErrorException('Access secret is not defined');
+    }
+
+    const adminAccessToken = await this.generateToken(
+      admin.id,
+      Env.jwtAdminSecret,
+      '1h',
+    );
+
+    // const refreshToken = await this.generateToken(
+    //   admin.id,
+    //   Env.jwtRefreshSecret,
+    //   '10d',
+    // );
+
+    const adminUserResponse = this.utlis.adminResponse(admin);
+    const responseData = plainToInstance(AdminLoginDto, {
+      adminUser: adminUserResponse,
+      accessToken: adminAccessToken,
+    });
+
+    return this.utlis.sendHttpResponse(
+      true,
+      HttpStatus.OK,
+      'Admin logged in',
       responseData,
       res,
     );

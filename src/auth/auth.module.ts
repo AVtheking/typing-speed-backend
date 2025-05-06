@@ -9,12 +9,20 @@ import { OtpService } from '../otp/otp.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Utils } from '../utils/utils';
 import { Mailer } from '../utils/Mailer';
+import { AdminService } from 'src/admin/admin.service';
 
 @Module({
   imports: [UsersModule, JwtModule.register({}), HttpModule],
 
   controllers: [AuthController],
-  providers: [AuthService, OtpService, PrismaService, Utils, Mailer],
+  providers: [
+    AuthService,
+    OtpService,
+    PrismaService,
+    Utils,
+    Mailer,
+    AdminService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

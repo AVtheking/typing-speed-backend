@@ -1,8 +1,7 @@
-version: "3.9"
 
 services:
   postgres:
-    container_name: chess_db
+    container_name: db
     image: postgres
     ports:
       - "5432:5432"
@@ -11,5 +10,22 @@ services:
     env_file:
       - .env
       
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+       - "6380:6379"
+    volumes:
+      - ./redis-data:/data
+  # testdb:
+  #   container_name: test_db
+  #   image: postgres
+  #   ports:
+  #     - "5433:5432"
+  #   volumes:
+  #     - ./postgres-data_test:/var/lib/postgresql/data
+  #   env_file:
+  #     - .env.test
 volumes:
   postgres-data:
+  postgres-data_test:

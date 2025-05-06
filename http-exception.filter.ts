@@ -9,6 +9,7 @@ import { Response } from 'express';
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
+    console.log('exception', exception);
     const ctx = host.switchToHttp();
 
     const response = ctx.getResponse<Response>();
@@ -19,9 +20,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response.status(status).json({
       success: false,
-      message: Array.isArray(errorResponse.message)
-        ? errorResponse.message[0]
-        : errorResponse.message,
+      message: errorResponse.message
+        ? Array.isArray(errorResponse.message)
+          ? errorResponse.message[0]
+          : errorResponse.message
+        : errorResponse, // Fallback to sending the entire errorResponse if message is not available
     });
   }
 }
